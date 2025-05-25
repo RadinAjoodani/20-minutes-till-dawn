@@ -15,8 +15,8 @@ public class Player {
     private float x, y; // Player position
     private float speed; // Player movement speed
     private int currentHp;
-    private int xp; // NEW: Player's current experience points
-    private int level; // NEW: Player's current level
+    private int xp; // NEW: Player's current experience points //
+    private int level; // NEW: Player's current level //
     public static final float PLAYER_SCALE_FACTOR = 4f;
 
     public Player(CharacterData characterData, Animation<TextureRegion> idleAnimation) {
@@ -24,8 +24,8 @@ public class Player {
         this.idleAnimation = idleAnimation;
         this.speed = characterData.getSpeed();
         this.currentHp = characterData.getHp();
-        this.xp = 0; // NEW: Initialize XP
-        this.level = 1; // NEW: Initialize level
+        this.xp = 0; // NEW: Initialize XP //
+        this.level = 1; // NEW: Initialize level //
     }
 
     public CharacterData getCharacterData() {
@@ -53,7 +53,7 @@ public class Player {
     }
 
     public float getSpeed() {
-        return speed * 20;
+        return speed * 40;
     }
 
     public int getCurrentHp() {
@@ -80,38 +80,38 @@ public class Player {
     }
 
     // NEW: Get player's current XP
-    public int getXp() {
-        return xp;
+    public int getXp() { //
+        return xp; //
     }
 
     // NEW: Get player's current Level
-    public int getLevel() {
-        return level;
+    public int getLevel() { //
+        return level; //
     }
 
     // NEW: Calculate XP needed for next level
-    public int getXpToNextLevel() {
+    public int getXpToNextLevel() { //
         // Formula: 20 * currentLevel XP
-        return 20 * level;
+        return 20 * level; //
     }
 
     // NEW: Add XP to player
-    public void addXp(int amount) {
-        this.xp += amount;
-        Gdx.app.log("Player", "Gained " + amount + " XP. Total XP: " + xp);
-        checkLevelUp();
+    public void addXp(int amount) { //
+        this.xp += amount; //
+        Gdx.app.log("Player", "Gained " + amount + " XP. Total XP: " + xp); //
+        checkLevelUp(); //
     }
 
     // NEW: Check if player can level up
-    private void checkLevelUp() {
-        while (xp >= getXpToNextLevel()) {
-            xp -= getXpToNextLevel(); // Deduct XP for current level
-            level++; // Increment level
+    private void checkLevelUp() { //
+        while (xp >= getXpToNextLevel()) { //
+            xp -= getXpToNextLevel(); // Deduct XP for current level //
+            level++; // Increment level //
             // Optionally, increase player stats here (e.g., max HP, speed)
             // characterData.setHp(characterData.getHp() + 10); // Example: increase max HP
             // this.currentHp = characterData.getHp(); // Heal to new max HP
             // this.speed = characterData.getSpeed(); // Update speed if it's dynamic
-            Gdx.app.log("Player", "Player Leveled Up! New Level: " + level + ", Remaining XP: " + xp);
+            Gdx.app.log("Player", "Player Leveled Up! New Level: " + level + ", Remaining XP: " + xp); //
         }
     }
 }

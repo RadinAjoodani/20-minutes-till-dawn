@@ -7,9 +7,9 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+// import com.badlogic.gdx.scenes.scene2d.ui.Skin; // No longer needed for font
 import controller.MainMenuController;
-import graphic.source.Main; // Assuming your main game class is `graphic.source.Main`
+import graphic.source.Main;
 import model.GameAssetManager;
 
 /**
@@ -17,8 +17,7 @@ import model.GameAssetManager;
  */
 public class GameOverScreen implements Screen {
     private SpriteBatch batch;
-    private BitmapFont font;
-    private Skin skin; // For general UI if needed, but for simple text, BitmapFont is fine.
+    private BitmapFont font; // Will be initialized directly
 
     private String username;
     private float aliveTimeSeconds;
@@ -35,28 +34,22 @@ public class GameOverScreen implements Screen {
     @Override
     public void show() {
         batch = new SpriteBatch();
-        skin = GameAssetManager.getGameAssetManager().getSkin(); // Get the shared skin
 
-        // It's good practice to get fonts from the skin if possible for consistency
-        font = skin.getFont("default-font"); // Use a font defined in your skin.json
-        if (font == null) {
-            Gdx.app.error("GameOverScreen", "Could not find 'default-font' in skin. Using new BitmapFont.");
-            font = new BitmapFont(); // Fallback if skin font not found
-            font.setColor(Color.WHITE);
-        } else {
-            font.setColor(Color.WHITE); // Ensure font color is white
-        }
-
+        // Initialize BitmapFont directly instead of getting from skin
+        font = new BitmapFont();
+        font.setColor(Color.WHITE); // Set default color
 
         Gdx.input.setInputProcessor(new com.badlogic.gdx.InputAdapter() {
             @Override
             public boolean keyDown(int keycode) {
                 // Return to Main Menu on any key press
+                // Pass the skin from GameAssetManager to MainMenuView as it might need it for other UI elements
                 Main.getMain().setScreen(new MainMenuView(new MainMenuController(), GameAssetManager.getGameAssetManager().getSkin()));
                 return true;
             }
             @Override
             public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+                // Pass the skin from GameAssetManager to MainMenuView
                 Main.getMain().setScreen(new MainMenuView(new MainMenuController(), GameAssetManager.getGameAssetManager().getSkin()));
                 return true;
             }
@@ -70,8 +63,7 @@ public class GameOverScreen implements Screen {
 
         batch.begin();
 
-        // Use GlyphLayout for centering text
-        GlyphLayout layout = new GlyphLayout();
+        GlyphLayout layout = new GlyphLayout(); // Use GlyphLayout for centering text
 
         // Game Over Title
         font.getData().setScale(2.0f); // Make title larger
@@ -80,9 +72,9 @@ public class GameOverScreen implements Screen {
         font.draw(batch, layout, (Gdx.graphics.getWidth() - layout.width) / 2, Gdx.graphics.getHeight() * 0.85f);
 
         // Reset font scale for stats
-        font.getData().setScale(1.2f);
-        float startY = Gdx.graphics.getHeight() * 0.65f; // Starting Y position for stats
-        float lineSpacing = 50f; // Vertical spacing between lines
+        font.getData().setScale(1.2f); // Slightly larger for stats
+        float startY = Gdx.graphics.getHeight() * 0.65f;
+        float lineSpacing = 50f;
 
         // Username
         String usernameText = "Username: " + username;
@@ -105,7 +97,7 @@ public class GameOverScreen implements Screen {
         font.draw(batch, layout, (Gdx.graphics.getWidth() - layout.width) / 2, startY - 3 * lineSpacing);
 
         // Instruction to return to main menu
-        font.getData().setScale(1.0f); // Reset to default size
+        font.getData().setScale(1.0f); // Reset to default size for instruction
         String instructionText = "Press Any Key or Touch to Return to Main Menu";
         layout.setText(font, instructionText);
         font.draw(batch, layout, (Gdx.graphics.getWidth() - layout.width) / 2, Gdx.graphics.getHeight() * 0.15f);
@@ -116,17 +108,20 @@ public class GameOverScreen implements Screen {
     @Override public void resize(int width, int height) {}
     @Override public void pause() {}
     @Override public void resume() {}
-    @Override public void hide() {
-        dispose();
+
+    @Override
+    public void hide() {
+        dispose(); // Dispose resources when screen is hidden
     }
+
     @Override
     public void dispose() {
-        batch.dispose();
-        // Do NOT dispose font if it's from the skin; the skin manages it.
-        // If you create `new BitmapFont()` in show(), then dispose it here.
-//        if (font != null && !skin.getFonts().containsValue(font, true)) { // Heuristic check if font is from skin
-//            font.dispose();
-//        }
-        // No need to dispose skin itself, as GameAssetManager manages it.
+        if (batch != null) {
+            batch.dispose();
+        }
+        // Dispose the font since we created it with "new BitmapFont()"
+        if (font != null) {
+            font.dispose();
+        }
     }
 }

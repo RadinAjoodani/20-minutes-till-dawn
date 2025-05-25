@@ -1,0 +1,61 @@
+[
+  {
+    "name": "SMG",
+    "damage":  8,
+    "projectile": 1,
+    "fire rate" : 0.1,
+    "reload time": 2,
+    "max ammo": 24,
+    "animations": {
+      "reload": [
+        "guns/SMG/SMGReload/SMGReload_0.png",
+        "guns/SMG/SMGReload/SMGReload_1.png",
+        "guns/SMG/SMGReload/SMGReload_2.png",
+        "guns/SMG/SMGReload/SMGReload_3.png"
+      ],
+      "still": [
+        "guns/SMG/SMGStill/SMGStill.png"
+      ]
+    }
+  },
+
+  {
+    "name": "Shotgun",
+    "damage": 10,
+    "projectile": 4,
+    "fire rate" : 0.6,
+    "reload time": 1,
+    "max ammo": 2,
+    "animations": {
+      "reload": [
+        "guns/Shotgun/ShotgunReload/ShotgunReload_0.png",
+        "guns/Shotgun/ShotgunReload/ShotgunReload_1.png",
+        "guns/Shotgun/ShotgunReload/ShotgunReload_2.png",
+        "guns/Shotgun/ShotgunReload/ShotgunReload_3.png"
+      ],
+      "still": [
+        "guns/Shotgun/ShotgunStill/ShotgunStill.png"
+      ]
+    }
+  },
+
+  {
+    "name": "Revolver",
+    "damage": 20,
+    "projectile": 1,
+    "fire rate" : 0.4,
+    "reload time": 1,
+    "max ammo": 6,
+    "animations": {
+      "reload": [
+        "guns/Revolver/RevolverReload/RevolverReload_0.png",
+        "guns/Revolver/RevolverReload/RevolverReload_1.png",
+        "guns/Revolver/RevolverReload/RevolverReload_2.png",
+        "guns/Revolver/RevolverReload/RevolverReload_3.png"
+      ],
+      "still": [
+        "guns/Revolver/RevolverStill/RevolverStill.png"
+      ]
+    }
+  }
+]

@@ -1,0 +1,53 @@
+[
+  {
+    "name": "Tree",
+    "damage": 10,
+    "damage rate": 1,
+    "hp": 1000,
+    "speed": 0,
+    "animations": {
+      "show": [
+          "enemies/Tree_monster/Tree_0.png",
+          "enemies/Tree_monster/Tree_1.png",
+          "enemies/Tree_monster/Tree_2.png"
+      ]
+    }
+  },
+
+  {
+    "name": "EyeBat",
+    "damage": 20,
+    "damage rate": 3,
+    "hp": 50,
+    "speed": 8,
+    "animations": {
+      "show": [
+        "enemies/Eye_bat/EyeBat_0.png",
+        "enemies/Eye_bat/EyeBat_1.png",
+        "enemies/Eye_bat/EyeBat_2.png",
+        "enemies/Eye_bat/EyeBat_3.png"
+      ]
+    }
+  },
+
+  {
+    "name": "Tentacle",
+    "damage": 15,
+    "damage rate": 1,
+    "hp": 25,
+    "speed": 4,
+    "animations": {
+      "show": [
+        "enemies/Tentacle/TentacleIdle/TentacleIdle0.png",
+        "enemies/Tentacle/TentacleIdle/TentacleIdle1.png",
+        "enemies/Tentacle/TentacleIdle/TentacleIdle2.png",
+        "enemies/Tentacle/TentacleIdle/TentacleIdle3.png"
+      ],
+      "spawn": [
+        "enemies/Tentacle/TentacleSpawn/TentacleSpawn0.png",
+        "enemies/Tentacle/TentacleSpawn/TentacleSpawn1.png",
+        "enemies/Tentacle/TentacleSpawn/TentacleSpawn2.png"
+      ]
+    }
+  }
+]

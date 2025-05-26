@@ -49,5 +49,18 @@
         "enemies/Tentacle/TentacleSpawn/TentacleSpawn2.png"
       ]
     }
+  },
+
+  {
+    "name": "Boss",
+    "damage": 4,
+    "damage rate": 1,
+    "hp": 400,
+    "speed": 10,
+    "animations": {
+      "show": [
+        "enemies/Boss_fight/ElderBrain.png"
+      ]
+    }
   }
 ]

@@ -5,9 +5,9 @@
     "password": "Radin123!",
     "avatarPath": "avatars/avatar_boy.png",
     "securityAnswer": "mamad",
-    "score": 1000,
-    "totalKill": 500,
-    "maximumTimeAlive": 100
+    "score": 1628,
+    "totalKill": 74,
+    "maximumTimeAlive": 120
   },
   {
     "class": "model.User",

@@ -7,49 +7,53 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.Color;
-// import com.badlogic.gdx.scenes.scene2d.ui.Skin; // No longer needed for font
 import controller.MainMenuController;
 import graphic.source.Main;
 import model.GameAssetManager;
 
-/**
- * Screen displayed when the game ends, showing final stats.
- */
 public class GameOverScreen implements Screen {
     private SpriteBatch batch;
-    private BitmapFont font; // Will be initialized directly
+    private BitmapFont font;
+    private BitmapFont titleFont;
 
     private String username;
     private float aliveTimeSeconds;
     private int kills;
     private int score;
+    private GameResult gameResult;
 
-    public GameOverScreen(String username, float aliveTimeSeconds, int kills, int score) {
-        this.username = username;
+    public enum GameResult {
+        WIN,
+        DIED,
+        GAVE_UP
+    }
+
+    public GameOverScreen(String username, float aliveTimeSeconds, int kills, int score, GameResult result) {
+        this.username = (username == null || username.trim().isEmpty()) ? "Player" : username; // Handle null or empty username
         this.aliveTimeSeconds = aliveTimeSeconds;
         this.kills = kills;
         this.score = score;
+        this.gameResult = result;
     }
 
     @Override
     public void show() {
         batch = new SpriteBatch();
 
-        // Initialize BitmapFont directly instead of getting from skin
         font = new BitmapFont();
-        font.setColor(Color.WHITE); // Set default color
+        font.setColor(Color.WHITE);
+
+        titleFont = new BitmapFont();
+        titleFont.getData().setScale(2.5f);
 
         Gdx.input.setInputProcessor(new com.badlogic.gdx.InputAdapter() {
             @Override
             public boolean keyDown(int keycode) {
-                // Return to Main Menu on any key press
-                // Pass the skin from GameAssetManager to MainMenuView as it might need it for other UI elements
                 Main.getMain().setScreen(new MainMenuView(new MainMenuController(), GameAssetManager.getGameAssetManager().getSkin()));
                 return true;
             }
             @Override
             public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-                // Pass the skin from GameAssetManager to MainMenuView
                 Main.getMain().setScreen(new MainMenuView(new MainMenuController(), GameAssetManager.getGameAssetManager().getSkin()));
                 return true;
             }
@@ -58,46 +62,74 @@ public class GameOverScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(0, 0, 0, 1); // Black background
+        Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         batch.begin();
 
-        GlyphLayout layout = new GlyphLayout(); // Use GlyphLayout for centering text
+        GlyphLayout layout = new GlyphLayout();
+        GlyphLayout userLayout = new GlyphLayout(); // For username specifically if needed below title
 
-        // Game Over Title
-        font.getData().setScale(2.0f); // Make title larger
-        String gameOverTitle = "GAME OVER!";
-        layout.setText(font, gameOverTitle);
-        font.draw(batch, layout, (Gdx.graphics.getWidth() - layout.width) / 2, Gdx.graphics.getHeight() * 0.85f);
+        String titleText;
+        Color titleColor;
+        String userSpecificMessage = "";
 
-        // Reset font scale for stats
-        font.getData().setScale(1.2f); // Slightly larger for stats
+        switch (gameResult) {
+            case WIN:
+                titleText = "YOU WIN!";
+                // Display username below "YOU WIN!" or as part of it.
+                // Let's display it below for better formatting.
+                userSpecificMessage = this.username + " is Victorious!";
+                titleColor = Color.GREEN;
+                break;
+            case GAVE_UP:
+                titleText = "YOU GAVE UP";
+                titleColor = Color.YELLOW;
+                break;
+            case DIED:
+            default:
+                titleText = "YOU ARE DEAD!";
+                titleColor = Color.RED;
+                break;
+        }
+        titleFont.setColor(titleColor);
+        layout.setText(titleFont, titleText);
+        titleFont.draw(batch, layout, (Gdx.graphics.getWidth() - layout.width) / 2, Gdx.graphics.getHeight() * 0.85f);
+
+        // Display user-specific message if any (like for WIN)
+        if (!userSpecificMessage.isEmpty()) {
+            font.getData().setScale(1.5f); // Slightly larger for this message
+            userLayout.setText(font, userSpecificMessage);
+            font.draw(batch, userLayout, (Gdx.graphics.getWidth() - userLayout.width) / 2, Gdx.graphics.getHeight() * 0.85f - layout.height - 15);
+            font.getData().setScale(1.0f); // Reset scale for stats
+        }
+
+
+        font.getData().setScale(1.2f);
         float startY = Gdx.graphics.getHeight() * 0.65f;
-        float lineSpacing = 50f;
+        if (!userSpecificMessage.isEmpty()) { // Adjust startY if user message was shown
+            startY -= (userLayout.height + 15);
+        }
+        float lineSpacing = 45f; // Adjusted line spacing
 
-        // Username
-        String usernameText = "Username: " + username;
-        layout.setText(font, usernameText);
+        // Display username in stats list always
+        String usernameStatText = "Player: " + this.username;
+        layout.setText(font, usernameStatText);
         font.draw(batch, layout, (Gdx.graphics.getWidth() - layout.width) / 2, startY);
 
-        // Alive Time
-        String aliveTimeText = String.format("Alive Time: %02d:%02d", (int)(aliveTimeSeconds / 60), (int)(aliveTimeSeconds % 60));
+        String aliveTimeText = String.format("Time Survived: %02d:%02d", (int)(aliveTimeSeconds / 60), (int)(aliveTimeSeconds % 60));
         layout.setText(font, aliveTimeText);
         font.draw(batch, layout, (Gdx.graphics.getWidth() - layout.width) / 2, startY - lineSpacing);
 
-        // Kills
-        String killsText = "Kills: " + kills;
+        String killsText = "Enemies Defeated: " + kills;
         layout.setText(font, killsText);
         font.draw(batch, layout, (Gdx.graphics.getWidth() - layout.width) / 2, startY - 2 * lineSpacing);
 
-        // Score
-        String scoreText = "Score: " + score;
+        String scoreText = "Final Score: " + score;
         layout.setText(font, scoreText);
         font.draw(batch, layout, (Gdx.graphics.getWidth() - layout.width) / 2, startY - 3 * lineSpacing);
 
-        // Instruction to return to main menu
-        font.getData().setScale(1.0f); // Reset to default size for instruction
+        font.getData().setScale(1.0f);
         String instructionText = "Press Any Key or Touch to Return to Main Menu";
         layout.setText(font, instructionText);
         font.draw(batch, layout, (Gdx.graphics.getWidth() - layout.width) / 2, Gdx.graphics.getHeight() * 0.15f);
@@ -111,17 +143,23 @@ public class GameOverScreen implements Screen {
 
     @Override
     public void hide() {
-        dispose(); // Dispose resources when screen is hidden
+        dispose();
     }
 
     @Override
     public void dispose() {
+        Gdx.app.log("GameOverScreen", "dispose() called");
         if (batch != null) {
             batch.dispose();
+            batch = null;
         }
-        // Dispose the font since we created it with "new BitmapFont()"
         if (font != null) {
             font.dispose();
+            font = null;
+        }
+        if (titleFont != null) {
+            titleFont.dispose();
+            titleFont = null;
         }
     }
 }

@@ -8,21 +8,32 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ObjectMap;
 
-/**
- * Represents an active enemy in the game, managing its state, position, and animations.
- */
 public class Enemy {
     private EnemyData enemyData;
-    private float x, y; // Current position
+    private float x, y;
     private float currentHp;
-    private ObjectMap<String, Animation<TextureRegion>> animations; // Loaded animations (e.g., "show", "spawn")
-    private float stateTime; // Time accumulator for current animation
-    private String currentAnimationName; // "show", "spawn", "attack", etc.
-    private float drawWidth, drawHeight; // Scaled drawing dimensions
-    public static final float ENEMY_SCALE_FACTOR = 1.5f; // Example scale factor
+    private ObjectMap<String, Animation<TextureRegion>> animations;
+    private Animation<TextureRegion> deathAnimation;
 
-    private float attackTimer; // Cooldown for melee attack
-    private float shootTimer; // Cooldown for ranged attack (e.g., EyeBat)
+    private float stateTime;
+    private String currentAnimationName;
+    private float drawWidth, drawHeight;
+    public static final float ENEMY_SCALE_FACTOR = 1.5f;
+
+    private float attackTimer;
+    private float shootTimer;
+
+    private boolean isDashing = false;
+    private float dashTimer = 0f;
+    private static final float DASH_DURATION = 3.0f;
+    private static final float DASH_SPEED_MULTIPLIER = 8f;
+    private Vector2 dashTargetPosition = null;
+    private Vector2 dashDirection = null; // Added this field back
+    private static final float BOSS_DRAW_WIDTH = 160f;
+    private static final float BOSS_DRAW_HEIGHT = 160f;
+
+    private boolean isDying = false;
+    private float deathAnimationStateTime = 0f;
 
 
     public Enemy(EnemyData enemyData, ObjectMap<String, Animation<TextureRegion>> animations, float startX, float startY) {
@@ -30,48 +41,64 @@ public class Enemy {
         this.animations = animations;
         this.x = startX;
         this.y = startY;
-        if (this.enemyData != null) { // Null check for enemyData
+
+        if (GameAssetManager.getGameAssetManager() != null) {
+            this.deathAnimation = GameAssetManager.getGameAssetManager().getEnemyDeathAnimation("damage");
+            if (this.deathAnimation == null) {
+                Gdx.app.log("Enemy", "Generic Enemy 'death' (explosion) animation not found for " + (enemyData != null ? enemyData.getName() : "Unknown") + ".");
+            }
+        } else {
+            Gdx.app.error("Enemy", "GameAssetManager is null, cannot load death animation.");
+        }
+
+        if (this.enemyData != null) {
             this.currentHp = enemyData.getHp();
-            this.currentAnimationName = "show"; // Default animation
-            // Calculate initial draw dimensions based on the first frame of the default animation
-            TextureRegion firstFrame = getAnimationFrame(currentAnimationName, 0f);
-            if (firstFrame != null) {
-                this.drawWidth = firstFrame.getRegionWidth() * ENEMY_SCALE_FACTOR;
-                this.drawHeight = firstFrame.getRegionHeight() * ENEMY_SCALE_FACTOR;
+            this.currentAnimationName = "show";
+
+            if (enemyData.getName().equals("Boss")) {
+                this.drawWidth = BOSS_DRAW_WIDTH;
+                this.drawHeight = BOSS_DRAW_HEIGHT;
             } else {
-                // Try "idle" if "show" isn't found
-                firstFrame = getAnimationFrame("idle", 0f);
+                TextureRegion firstFrame = getAnimationFrameForSetup(currentAnimationName);
                 if (firstFrame != null) {
-                    this.currentAnimationName = "idle";
                     this.drawWidth = firstFrame.getRegionWidth() * ENEMY_SCALE_FACTOR;
                     this.drawHeight = firstFrame.getRegionHeight() * ENEMY_SCALE_FACTOR;
                 } else {
-                    Gdx.app.error("Enemy", "No 'show' or 'idle' animation found for " + enemyData.getName() + ". Using default size.");
-                    this.drawWidth = 50 * ENEMY_SCALE_FACTOR; // Fallback size
-                    this.drawHeight = 50 * ENEMY_SCALE_FACTOR;
+                    firstFrame = getAnimationFrameForSetup("idle");
+                    if (firstFrame != null) {
+                        this.currentAnimationName = "idle";
+                        this.drawWidth = firstFrame.getRegionWidth() * ENEMY_SCALE_FACTOR;
+                        this.drawHeight = firstFrame.getRegionHeight() * ENEMY_SCALE_FACTOR;
+                    } else {
+                        Gdx.app.error("Enemy", "No 'show' or 'idle' animation for " + enemyData.getName() + ". Using default size.");
+                        this.drawWidth = 50 * ENEMY_SCALE_FACTOR;
+                        this.drawHeight = 50 * ENEMY_SCALE_FACTOR;
+                    }
                 }
             }
         } else {
-            Gdx.app.error("Enemy", "CRITICAL: EnemyData is null in Enemy constructor. Enemy will not function.");
-            // Initialize with placeholder/default values to prevent further NPEs, though this enemy is broken
-            this.currentHp = 0;
-            this.drawWidth = 50 * ENEMY_SCALE_FACTOR;
-            this.drawHeight = 50 * ENEMY_SCALE_FACTOR;
-            this.currentAnimationName = "none";
+            Gdx.app.error("Enemy", "CRITICAL: EnemyData is null in Enemy constructor.");
+            this.currentHp = 0; this.drawWidth = 50; this.drawHeight = 50; this.currentAnimationName = "none";
         }
         this.stateTime = 0f;
         this.attackTimer = 0f;
         this.shootTimer = 0f;
     }
 
-    /**
-     * Updates the enemy's state, including movement and animation.
-     * @param delta Time since last frame.
-     * @param targetX X-coordinate of the target (e.g., player).
-     * @param targetY Y-coordinate of the target (e.g., player).
-     */
+    private TextureRegion getAnimationFrameForSetup(String animName) {
+        if (animations == null || animName == null) return null;
+        Animation<TextureRegion> anim = animations.get(animName);
+        if (anim != null && anim.getKeyFrames() != null && anim.getKeyFrames().length > 0) {
+            return anim.getKeyFrame(0);
+        }
+        return null;
+    }
+
+
     public void update(float delta, float targetX, float targetY) {
-        if (enemyData == null) { // If enemyData is null, can't do much
+        if (enemyData == null) return;
+        if (isDying) {
+            deathAnimationStateTime += delta;
             return;
         }
 
@@ -79,103 +106,113 @@ public class Enemy {
         attackTimer += delta;
         shootTimer += delta;
 
-        // Movement logic
-        if (enemyData.getSpeed() > 0 && !(enemyData.getName().equals("Tree"))) {
-            float oldX = x;
-            float oldY = y;
-
-            Vector2 enemyPos = new Vector2(x, y);
-            Vector2 targetPos = new Vector2(targetX, targetY);
-            Vector2 direction = targetPos.sub(enemyPos); // Get vector from enemy to target
-
-            // Log for a specific enemy type to avoid spamming console too much
-            if (enemyData.getName().equals("TentacleMonster") || enemyData.getName().equals("EyeBat")) {
-                Gdx.app.log("EnemyMoveDebug_" + enemyData.getName(), "Delta: " + delta +
-                    ", Speed: " + enemyData.getSpeed() +
-                    ", CurrentPos: (" + String.format("%.2f", x) + "," + String.format("%.2f", y) + ")" +
-                    ", TargetPos: (" + String.format("%.2f", targetX) + "," + String.format("%.2f", targetY) + ")" +
-                    ", DirectionBeforeNor: (" + String.format("%.2f", direction.x) + "," + String.format("%.2f", direction.y) + ")");
-            }
-
-            if (direction.len2() > 0) { // Only normalize and move if not already at target (or very close)
-                direction.nor(); // Normalize to get unit direction vector
-
-                float moveX = direction.x * enemyData.getSpeed() * delta;
-                float moveY = direction.y * enemyData.getSpeed() * delta;
-
-                x += moveX;
-                y += moveY;
-
-                if (enemyData.getName().equals("TentacleMonster") || enemyData.getName().equals("EyeBat")) {
-                    Gdx.app.log("EnemyMoveDebug_" + enemyData.getName(), "NormalizedDir: (" + String.format("%.2f", direction.x) + "," + String.format("%.2f", direction.y) + ")" +
-                        ", MoveOffset: (" + String.format("%.4f", moveX) + "," + String.format("%.4f", moveY) + ")" +
-                        ", NewPos: (" + String.format("%.2f", x) + "," + String.format("%.2f", y) + ")");
-                    if(x == oldX && y == oldY && (Math.abs(moveX) > 0.0001f || Math.abs(moveY) > 0.0001f)) {
-                        Gdx.app.error("EnemyMoveDebug_" + enemyData.getName(), "Movement applied but position did not change!");
-                    }
-                }
+        if (isDashing) {
+            dashTimer += delta;
+            if (dashTimer < DASH_DURATION && dashDirection != null) {
+                float actualDashSpeed = enemyData.getSpeed() * DASH_SPEED_MULTIPLIER;
+                x += dashDirection.x * actualDashSpeed * delta;
+                y += dashDirection.y * actualDashSpeed * delta;
             } else {
-                if (enemyData.getName().equals("TentacleMonster") || enemyData.getName().equals("EyeBat")) {
-                    Gdx.app.log("EnemyMoveDebug_" + enemyData.getName(), "Enemy is at target or direction vector is zero. No movement.");
+                isDashing = false;
+                dashTimer = 0f;
+                dashTargetPosition = null;
+                dashDirection = null;
+                setAnimation("show");
+                Gdx.app.log(getName(), "Dash ended.");
+            }
+        } else {
+            if (enemyData.getSpeed() > 0 && !(enemyData.getName().equals("Tree"))) {
+                Vector2 enemyPos = new Vector2(x, y);
+                Vector2 targetPos = new Vector2(targetX, targetY);
+                Vector2 direction = targetPos.sub(enemyPos);
+                if (direction.len2() > 0.001f) {
+                    direction.nor();
+                    x += direction.x * enemyData.getSpeed() * delta;
+                    y += direction.y * enemyData.getSpeed() * delta;
                 }
             }
         }
 
-        // Handle animation transitions if needed
         if (animations != null && currentAnimationName != null) {
             if (currentAnimationName.equals("spawn")) {
                 Animation<TextureRegion> spawnAnim = animations.get("spawn");
-                if (spawnAnim != null && stateTime >= spawnAnim.getAnimationDuration()) {
-                    setAnimation("show"); // Switch to show/idle after spawn
+                if (spawnAnim != null && stateTime >= spawnAnim.getAnimationDuration() && !isDashing) {
+                    setAnimation("show");
                 }
             }
         }
     }
 
-    public void draw(SpriteBatch batch) {
-        if (enemyData == null || currentAnimationName == null || currentAnimationName.equals("none")) return; // Don't draw if no data or anim
+    public void startDash(float targetPlayerX, float targetPlayerY) {
+        if (enemyData == null || !enemyData.getName().equals("Boss") || isDashing || isDying) return;
+        isDashing = true;
+        dashTimer = 0f;
+        this.dashTargetPosition = new Vector2(targetPlayerX, targetPlayerY);
+        this.dashDirection = new Vector2(targetPlayerX - x, targetPlayerY - y).nor(); // Ensure dashDirection is initialized
+        Gdx.app.log(getName(), "Started dash towards (" + targetPlayerX + ", " + targetPlayerY + ") with direction (" + dashDirection.x + ", " + dashDirection.y + ")");
+    }
 
-        TextureRegion currentFrame = getAnimationFrame(currentAnimationName, stateTime);
+    public boolean isDashing() { return isDashing; }
+    public boolean isDying() { return isDying; }
+
+    public void draw(SpriteBatch batch) {
+        if (enemyData == null) return;
+
+        TextureRegion currentFrame = null;
+        if (isDying && deathAnimation != null) {
+            currentFrame = deathAnimation.getKeyFrame(deathAnimationStateTime, false);
+        } else if (currentAnimationName != null && !currentAnimationName.equals("none")) {
+            currentFrame = getAnimationFrame(currentAnimationName, isDashing ? dashTimer : stateTime);
+        }
+
         if (currentFrame != null) {
             batch.draw(currentFrame, x, y, drawWidth, drawHeight);
-        } else {
-            // This error is now less likely due to constructor checks but good to keep
-            // Gdx.app.error("Enemy", "Current animation frame is null for " + enemyData.getName() + " (" + currentAnimationName + ")");
         }
     }
 
     public boolean takeDamage(int amount) {
-        if (enemyData == null) return false;
+        if (enemyData == null || isDying || currentHp <= 0) return true;
         currentHp -= amount;
         Gdx.app.log("Enemy", enemyData.getName() + " took " + amount + " damage. HP: " + currentHp);
         if (currentHp <= 0) {
-            currentHp = 0; // Ensure HP doesn't go negative for checks
+            currentHp = 0;
+            if (deathAnimation != null) {
+                isDying = true;
+                deathAnimationStateTime = 0f;
+                Gdx.app.log("Enemy", enemyData.getName() + " is now dying.");
+            } else {
+                Gdx.app.log("Enemy", enemyData.getName() + " died (no death animation).");
+            }
             return true;
         }
         return false;
     }
 
     public boolean isAlive() {
+        if (isDying && deathAnimation != null) {
+            return !deathAnimation.isAnimationFinished(deathAnimationStateTime);
+        }
         return currentHp > 0;
     }
 
-    public String getName() {
-        return enemyData != null ? enemyData.getName() : "UnknownEnemy";
+    public boolean isDeathAnimationFinished() {
+        if (isDying) {
+            if (deathAnimation != null) {
+                return deathAnimation.isAnimationFinished(deathAnimationStateTime);
+            }
+            return true;
+        }
+        // If not dying but HP is <= 0 (e.g. no death animation), it's considered "finished" in terms of being dead.
+        return !isDying && currentHp <= 0;
     }
 
-    public EnemyData getEnemyData() {
-        return enemyData;
-    }
 
-    public float getX() {
-        return x;
-    }
-
-    public float getY() {
-        return y;
-    }
-
+    public String getName() { return enemyData != null ? enemyData.getName() : "UnknownEnemy"; }
+    public EnemyData getEnemyData() { return enemyData; }
+    public float getX() { return x; }
+    public float getY() { return y; }
     public Rectangle getBounds() {
+        if (isDying) return new Rectangle(-1000, -1000, 0, 0);
         return new Rectangle(x, y, drawWidth, drawHeight);
     }
 
@@ -183,56 +220,47 @@ public class Enemy {
         if (animations == null || animName == null) return null;
         Animation<TextureRegion> anim = animations.get(animName);
         if (anim != null) {
-            boolean looping = animName.equals("show") || animName.equals("idle"); // Default looping for these
-            // Add other non-looping animations if needed
-            if (animName.equals("spawn") || animName.equals("attack") || animName.equals("damaged") || animName.equals("death")) {
+            boolean looping = animName.equals("show") || animName.equals("idle");
+            if (animName.equals("spawn") || animName.equals("attack") || animName.equals("damaged") || animName.equals("death") || animName.equals("dash")) {
                 looping = false;
             }
             return anim.getKeyFrame(time, looping);
         }
-        // Gdx.app.warn("Enemy", "Animation not found: " + animName + " for " + (enemyData != null ? enemyData.getName() : "UnknownEnemy"));
         return null;
     }
 
     public void setAnimation(String animationName) {
-        if (animations == null || !animations.containsKey(animationName)) {
-            // Gdx.app.warn("Enemy", "Cannot set animation: " + animationName + ". Not found for " + (enemyData != null ? enemyData.getName() : "UnknownEnemy"));
-            // Fallback to "show" or "idle" if the requested one isn't found and a default exists
-            if (animations != null && animations.containsKey("show")) {
-                this.currentAnimationName = "show";
-            } else if (animations != null && animations.containsKey("idle")) {
-                this.currentAnimationName = "idle";
-            } else {
-                this.currentAnimationName = "none"; // Indicates no valid animation
-            }
+        if (isDying) return;
+        if (animations == null) return;
+        if (!animations.containsKey(animationName)) {
+            if (animations.containsKey("show")) this.currentAnimationName = "show";
+            else if (animations.containsKey("idle")) this.currentAnimationName = "idle";
+            else this.currentAnimationName = "none";
             this.stateTime = 0f;
             return;
         }
-
-        if (this.currentAnimationName == null || !this.currentAnimationName.equals(animationName)) {
+        if (this.currentAnimationName == null || !this.currentAnimationName.equals(animationName) ||
+            (animationName.equals("show") && isDashing)) {
+            if (animationName.equals("show") && isDashing) return;
             this.currentAnimationName = animationName;
-            this.stateTime = 0f;
+            if (!isDashing || !animationName.equals("dash")) {
+                this.stateTime = 0f;
+            }
         }
     }
 
     public boolean canAttack(float delta) {
-        if (enemyData == null || enemyData.getDamage() <= 0) return false; // Only attack if damage > 0
-
-        // Use getDamage_rate() which should be loaded if JSON key is damage_rate
+        if (enemyData == null || enemyData.getDamage() <= 0 || isDashing || isDying) return false;
         if (attackTimer >= enemyData.getDamage_rate()) {
-            attackTimer = 0f;
-            return true;
+            attackTimer = 0f; return true;
         }
         return false;
     }
 
     public boolean canShoot(float delta) {
-        if (enemyData == null || !enemyData.getName().equals("EyeBat") || enemyData.getDamage_rate() <= 0) {
-            return false;
-        }
+        if (enemyData == null || !enemyData.getName().equals("EyeBat") || enemyData.getDamage_rate() <= 0 || isDashing || isDying) return false;
         if (shootTimer >= enemyData.getDamage_rate()) {
-            shootTimer = 0f;
-            return true;
+            shootTimer = 0f; return true;
         }
         return false;
     }

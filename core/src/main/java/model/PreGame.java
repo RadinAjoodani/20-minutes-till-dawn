@@ -12,7 +12,13 @@ public class PreGame {
 
     public PreGame() {
         this.gameDurationMinutes = 5; // Default duration
-        this.username = "Guest"; // Default username
+
+        if (App.getInstance().getCurrentUser() != null ){
+            this.username = App.getInstance().getCurrentUser().getUsername();
+        }
+        else {
+            this.username = "Guest"; // Default username
+        }
     }
 
     public Player getPlayer() {

@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Player",
+    "animations": {
+      "damage": [
+        "damages/player/d0.png",
+        "damages/player/d1.png",
+        "damages/player/d2.png"
+      ]
+    }
+  },
+
+  {
+    "name": "Enemy",
+    "animations": {
+      "damage": [
+        "damages/enemy/ExplosionFX_0.png",
+        "damages/enemy/ExplosionFX_1.png",
+        "damages/enemy/ExplosionFX_2.png",
+        "damages/enemy/ExplosionFX_3.png",
+        "damages/enemy/ExplosionFX_4.png",
+        "damages/enemy/ExplosionFX_5.png"
+      ]
+    }
+  }
+]

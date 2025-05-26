@@ -1,12 +1,13 @@
 package controller;
 
+import com.badlogic.gdx.Gdx; // Import Gdx
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import graphic.source.Main;
 import model.App;
 import model.GameAssetManager;
 import view.*;
-// import view.SettingsMenuView;
+// import view.SettingsMenuView; // Already imported if used
 
 
 public class MainMenuController {
@@ -18,87 +19,123 @@ public class MainMenuController {
     }
 
     private void setupListeners() {
-        view.getContinueGameButton().addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                handleContinueGameButtonClick();
-            }
-        });
-        view.getPreGameMenuButton().addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                handlePreGameMenuButtonClick();
-            }
-        });
-        view.getHintMenuButton().addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                handleHintMenuButtonClick();
-            }
-        });
-        view.getScoreboardMenuButton().addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                handleScoreboardMenuButtonClick();
-            }
-        });
-        view.getSettingMenuButton().addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                handleSettingMenuButtonClick();
-            }
-        });
-        view.getProfileMenuButton().addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                handleProfileMenuButtonClick();
-            }
-        });
-        view.getLogoutButton().addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                handleLogoutButtonClick();
-            }
-        });
+        if (view == null) {
+            Gdx.app.error("MainMenuController", "View is null, cannot setup listeners.");
+            return;
+        }
+
+        if (view.getContinueGameButton() != null) {
+            view.getContinueGameButton().addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    handleContinueGameButtonClick();
+                }
+            });
+        } else { Gdx.app.error("MainMenuController", "ContinueGameButton is null.");}
+
+
+        if (view.getPreGameMenuButton() != null) {
+            view.getPreGameMenuButton().addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    handlePreGameMenuButtonClick();
+                }
+            });
+        } else { Gdx.app.error("MainMenuController", "PreGameMenuButton is null.");}
+
+
+        if (view.getHintMenuButton() != null) {
+            view.getHintMenuButton().addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    handleHintMenuButtonClick(); // Updated this handler
+                }
+            });
+        } else { Gdx.app.error("MainMenuController", "HintMenuButton is null.");}
+
+
+        if (view.getScoreboardMenuButton() != null) {
+            view.getScoreboardMenuButton().addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    handleScoreboardMenuButtonClick();
+                }
+            });
+        } else { Gdx.app.error("MainMenuController", "ScoreboardMenuButton is null.");}
+
+
+        if (view.getSettingMenuButton() != null) {
+            view.getSettingMenuButton().addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    handleSettingMenuButtonClick();
+                }
+            });
+        } else { Gdx.app.error("MainMenuController", "SettingMenuButton is null.");}
+
+
+        if (view.getProfileMenuButton() != null) {
+            view.getProfileMenuButton().addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    handleProfileMenuButtonClick();
+                }
+            });
+        } else { Gdx.app.error("MainMenuController", "ProfileMenuButton is null.");}
+
+
+        if (view.getLogoutButton() != null) {
+            view.getLogoutButton().addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    handleLogoutButtonClick();
+                }
+            });
+        } else { Gdx.app.error("MainMenuController", "LogoutButton is null.");}
+
     }
 
     private void handleContinueGameButtonClick() {
-        System.out.println("Attempting to continue saved game...");
-        view.getWelcomeLabel().setText("Feature coming soon!");
+        Gdx.app.log("MainMenuController", "Attempting to continue saved game...");
+        if (view != null && view.getWelcomeLabel() != null) {
+            view.getWelcomeLabel().setText("Feature coming soon!");
+        }
     }
 
     private void handlePreGameMenuButtonClick() {
-        System.out.println("Navigating to Pre-Game Menu...");
-        Main.getMain().getScreen().dispose();
+        Gdx.app.log("MainMenuController", "Navigating to Pre-Game Menu...");
+        if (Main.getMain().getScreen() != null) Main.getMain().getScreen().dispose();
         Main.getMain().setScreen(new PreGameMenuView(new PreGameMenuController(), GameAssetManager.getGameAssetManager().getSkin()));
     }
 
     private void handleHintMenuButtonClick() {
-        System.out.println("Navigating to Hint Menu...");
+        Gdx.app.log("MainMenuController", "Navigating to Hint Menu...");
+        if (Main.getMain().getScreen() != null) Main.getMain().getScreen().dispose(); // Dispose current screen if any
+        Main.getMain().setScreen(new HintMenuView(new HintMenuController())); // Create and set new HintMenuView
     }
 
     private void handleScoreboardMenuButtonClick() {
-        System.out.println("Navigating to Scoreboard Menu...");
-        Main.getMain().getScreen().dispose();
+        Gdx.app.log("MainMenuController", "Navigating to Scoreboard Menu...");
+        if (Main.getMain().getScreen() != null) Main.getMain().getScreen().dispose();
         Main.getMain().setScreen(new ScoreBoardMenuView(new ScoreBoardMenuController(), GameAssetManager.getGameAssetManager().getSkin()));
     }
 
     private void handleSettingMenuButtonClick() {
-        System.out.println("Navigating to Settings Menu...");
-        Main.getMain().getScreen().dispose();
+        Gdx.app.log("MainMenuController", "Navigating to Settings Menu...");
+        if (Main.getMain().getScreen() != null) Main.getMain().getScreen().dispose();
         Main.getMain().setScreen(new SettingsMenuView(new SettingsMenuController(), GameAssetManager.getGameAssetManager().getSkin()));
     }
 
     private void handleProfileMenuButtonClick() {
-        System.out.println("Navigating to Profile Menu...");
-        Main.getMain().getScreen().dispose();
+        Gdx.app.log("MainMenuController", "Navigating to Profile Menu...");
+        if (Main.getMain().getScreen() != null) Main.getMain().getScreen().dispose();
         Main.getMain().setScreen(new ProfileMenuView(new ProfileMenuController(), GameAssetManager.getGameAssetManager().getSkin()));
     }
 
     private void handleLogoutButtonClick() {
-        System.out.println("Logging out...");
+        Gdx.app.log("MainMenuController", "Logging out...");
         App.getInstance().setCurrentUser(null);
-        Main.getMain().getScreen().dispose();
+        if (Main.getMain().getScreen() != null) Main.getMain().getScreen().dispose();
         Main.getMain().setScreen(new LoginMenuView(new LoginMenuController(), GameAssetManager.getGameAssetManager().getSkin()));
     }
 }

@@ -201,4 +201,8 @@ public class StartupHelper {
     public static boolean startNewJvmIfRequired() {
         return startNewJvmIfRequired(true);
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 1713f21e921b05a8bbc5730f5aa20cd1530a7a86

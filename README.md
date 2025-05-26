@@ -1,6 +1,9 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 # 20-minutes-till-dawn
 =======
+=======
+>>>>>>> 1713f21e921b05a8bbc5730f5aa20cd1530a7a86
 # game
 
 A [libGDX](https://libgdx.com/) project generated with [gdx-liftoff](https://github.com/libgdx/gdx-liftoff).
@@ -34,4 +37,7 @@ Useful Gradle tasks and flags:
 
 Note that most tasks that are not specific to a single project can be run with `name:` prefix, where the `name` should be replaced with the ID of a specific project.
 For example, `core:clean` removes `build` folder only from the `core` project.
+<<<<<<< HEAD
 >>>>>>> 294cd0c (first commit)
+=======
+>>>>>>> 1713f21e921b05a8bbc5730f5aa20cd1530a7a86

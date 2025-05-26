@@ -29,7 +29,11 @@ public class User {
 
     }
 
+<<<<<<< HEAD
 
+=======
+    // for loading users:
+>>>>>>> 1713f21e921b05a8bbc5730f5aa20cd1530a7a86
     public User(String username, String password, String avatarPath, String securityQuestion, String securityAnswer, int score) {
         this.username = username;
         this.password = password;

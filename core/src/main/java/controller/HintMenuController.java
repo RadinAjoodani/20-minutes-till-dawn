@@ -1,5 +1,6 @@
 package controller;
 
+<<<<<<< HEAD
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -117,4 +118,7 @@ public class HintMenuController {
         info.put("description", description);
         return info;
     }
+=======
+public class HintMenuController {
+>>>>>>> 1713f21e921b05a8bbc5730f5aa20cd1530a7a86
 }

@@ -72,11 +72,19 @@ public class App {
         if (localFile.exists()) {
             users = json.fromJson(Array.class, User.class, localFile);
         } else {
+<<<<<<< HEAD
 
             FileHandle internalFile = Gdx.files.internal("users.json");
             if (internalFile.exists()) {
                 users = json.fromJson(Array.class, User.class, internalFile);
                 localFile.writeString(internalFile.readString(), false);
+=======
+            // Read default from internal (assets) only once on first run
+            FileHandle internalFile = Gdx.files.internal("users.json");
+            if (internalFile.exists()) {
+                users = json.fromJson(Array.class, User.class, internalFile);
+                localFile.writeString(internalFile.readString(), false); // Copy to local
+>>>>>>> 1713f21e921b05a8bbc5730f5aa20cd1530a7a86
             } else {
                 users = new Array<>();
             }
@@ -85,6 +93,7 @@ public class App {
 
     public void saveUsers() {
         Json json = new Json();
+<<<<<<< HEAD
         json.setUsePrototypes(false);
         json.setOutputType(JsonWriter.OutputType.json);
 
@@ -94,6 +103,17 @@ public class App {
         String uglyJson = json.toJson(users);
 
 
+=======
+        json.setUsePrototypes(false); // prevents writing "class" field unless needed
+        json.setOutputType(JsonWriter.OutputType.json); // makes sure output is standard JSON
+
+        FileHandle file = Gdx.files.local("users.json");
+
+        // Write to string first
+        String uglyJson = json.toJson(users);
+
+        // Make it prettier using basic formatting (optional custom formatter)
+>>>>>>> 1713f21e921b05a8bbc5730f5aa20cd1530a7a86
         String prettyJson = formatJson(uglyJson);
 
         file.writeString(prettyJson, false);
@@ -152,7 +172,11 @@ public class App {
 
     private void appendIndent(StringBuilder sb, int indent) {
         for (int i = 0; i < indent; i++) {
+<<<<<<< HEAD
             sb.append("  ");
+=======
+            sb.append("  "); // two spaces per indent
+>>>>>>> 1713f21e921b05a8bbc5730f5aa20cd1530a7a86
         }
     }
 

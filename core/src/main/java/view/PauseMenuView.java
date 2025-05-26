@@ -1,5 +1,6 @@
 package view;
 
+<<<<<<< HEAD
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
@@ -260,4 +261,7 @@ public class PauseMenuView implements Screen {
     public TextButton getGiveUpButton() {
         return giveUpButton;
     }
+=======
+public class PauseMenuView {
+>>>>>>> 1713f21e921b05a8bbc5730f5aa20cd1530a7a86
 }

@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 
+=======
+// controller/PreGameMenuController.java
+>>>>>>> 1713f21e921b05a8bbc5730f5aa20cd1530a7a86
 package controller;
 
 import com.badlogic.gdx.Gdx;
@@ -14,7 +18,10 @@ import com.badlogic.gdx.utils.ObjectMap;
 import graphic.source.Main;
 import model.*;
 import view.GameView;
+<<<<<<< HEAD
 import view.MainMenuView;
+=======
+>>>>>>> 1713f21e921b05a8bbc5730f5aa20cd1530a7a86
 import view.PreGameMenuView;
 
 public class PreGameMenuController {
@@ -59,9 +66,15 @@ public class PreGameMenuController {
                     pregame.setSelectedGun(null);
                     return;
                 }
+<<<<<<< HEAD
 
                 ObjectMap<String, Animation<TextureRegion>> loadedGunAnimations = loadAllAnimations(gunAnimationPaths, 0.1f);
                 Gun gun = new Gun(gunData, loadedGunAnimations);
+=======
+                // This line now correctly loads all animations, including 'reload'
+                ObjectMap<String, Animation<TextureRegion>> loadedGunAnimations = loadAllAnimations(gunAnimationPaths, 0.1f);
+                Gun gun = new Gun(gunData, loadedGunAnimations); // Gun now initialized with max ammo
+>>>>>>> 1713f21e921b05a8bbc5730f5aa20cd1530a7a86
                 pregame.setSelectedGun(gun);
                 Gdx.app.log("PreGameMenuController", "Gun initialized with default selected gun: " + gunData.getName());
             } else {
@@ -163,7 +176,10 @@ public class PreGameMenuController {
         view.getBackButton().addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+<<<<<<< HEAD
                 Main.getMain().setScreen(new MainMenuView(new MainMenuController(), GameAssetManager.getGameAssetManager().getSkin()));
+=======
+>>>>>>> 1713f21e921b05a8bbc5730f5aa20cd1530a7a86
             }
         });
     }
@@ -195,7 +211,11 @@ public class PreGameMenuController {
                 Array<String> paths = entry.value;
                 if (paths != null && paths.size > 0) {
                     float frameDuration = defaultFrameDuration;
+<<<<<<< HEAD
                     Animation.PlayMode playMode = Animation.PlayMode.LOOP;
+=======
+                    Animation.PlayMode playMode = Animation.PlayMode.LOOP; // Default to loop
+>>>>>>> 1713f21e921b05a8bbc5730f5aa20cd1530a7a86
 
                     if (animationName.equals("still")) {
                         frameDuration = 0.5f; // A longer duration for a 'still' frame

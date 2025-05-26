@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 
+=======
+// controller/SettingsMenuController.java
+>>>>>>> 1713f21e921b05a8bbc5730f5aa20cd1530a7a86
 package controller;
 
 import com.badlogic.gdx.Gdx;

@@ -14,7 +14,14 @@ import model.GameAssetManager;
 import view.MainMenuView;
 import view.RegisterMenuView;
 
+<<<<<<< HEAD
 
+=======
+/**
+ * {@link com.badlogic.gdx.ApplicationListener} implementation shared by all
+ * platforms.
+ */
+>>>>>>> 1713f21e921b05a8bbc5730f5aa20cd1530a7a86
 public class Main extends Game {
     private static Main main;
     private static SpriteBatch batch;

@@ -88,6 +88,7 @@ public class LoginMenuView implements Screen {
         table.add(errorLabel).colspan(2).center().padBottom(10).row();
         table.add(successfulLabel).colspan(2).center().padBottom(10).row();
         table.add(usernameLabel).right().padRight(10);
+<<<<<<< HEAD
         table.add(usernameField).width(300).height(70).padBottom(20).row();
         table.add(passwordLabel).right().padRight(10);
         table.add(passwordField).width(300).height(70).padBottom(20).row();
@@ -95,11 +96,24 @@ public class LoginMenuView implements Screen {
         table.add(answerField).width(300).height(70).padBottom(20).row();
         table.add(newPasswordLabel).right().padRight(10);
         table.add(newPasswordField).width(300).height(70).padBottom(20).row();
+=======
+        table.add(usernameField).width(300).height(50).padBottom(20).row();
+        table.add(passwordLabel).right().padRight(10);
+        table.add(passwordField).width(300).height(50).padBottom(20).row();
+        table.add(questionLabel).right().padRight(10);
+        table.add(answerField).width(300).height(50).padBottom(20).row();
+        table.add(newPasswordLabel).right().padRight(10);
+        table.add(newPasswordField).width(300).height(50).padBottom(20).row();
+>>>>>>> 1713f21e921b05a8bbc5730f5aa20cd1530a7a86
         table.add(loginButton).padRight(10);
         table.add(forgetPasswordButton).padLeft(10).row();
         table.add(checkSecurityQuestionButton).colspan(2).center().padTop(20).row();
         table.add(changePasswordButton).colspan(2).center().padTop(20).row();
+<<<<<<< HEAD
         table.add(backButton).colspan(2).center().padTop(20).row();
+=======
+        table.add(backButton).colspan(2).center().padTop(30).row();
+>>>>>>> 1713f21e921b05a8bbc5730f5aa20cd1530a7a86
         stage.addActor(table);
         table.pack();
         showLoginForm();

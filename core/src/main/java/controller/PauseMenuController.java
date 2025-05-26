@@ -1,5 +1,6 @@
 package controller;
 
+<<<<<<< HEAD
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -90,4 +91,7 @@ public class PauseMenuController {
     public void setGameViewInstance(GameView gameViewInstance) {
         this.gameViewInstance = gameViewInstance;
     }
+=======
+public class PauseMenuController {
+>>>>>>> 1713f21e921b05a8bbc5730f5aa20cd1530a7a86
 }

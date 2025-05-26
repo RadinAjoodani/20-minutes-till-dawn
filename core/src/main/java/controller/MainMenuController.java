@@ -1,13 +1,13 @@
 package controller;
 
-import com.badlogic.gdx.Gdx; // Import Gdx
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import graphic.source.Main;
 import model.App;
 import model.GameAssetManager;
 import view.*;
-// import view.SettingsMenuView; // Already imported if used
+
 
 
 public class MainMenuController {
@@ -48,7 +48,7 @@ public class MainMenuController {
             view.getHintMenuButton().addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    handleHintMenuButtonClick(); // Updated this handler
+                    handleHintMenuButtonClick();
                 }
             });
         } else { Gdx.app.error("MainMenuController", "HintMenuButton is null.");}
@@ -110,8 +110,8 @@ public class MainMenuController {
 
     private void handleHintMenuButtonClick() {
         Gdx.app.log("MainMenuController", "Navigating to Hint Menu...");
-        if (Main.getMain().getScreen() != null) Main.getMain().getScreen().dispose(); // Dispose current screen if any
-        Main.getMain().setScreen(new HintMenuView(new HintMenuController())); // Create and set new HintMenuView
+        if (Main.getMain().getScreen() != null) Main.getMain().getScreen().dispose();
+        Main.getMain().setScreen(new HintMenuView(new HintMenuController()));
     }
 
     private void handleScoreboardMenuButtonClick() {

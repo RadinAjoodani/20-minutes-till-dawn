@@ -36,7 +36,7 @@ public class HintMenuView implements Screen {
         this.skin = GameAssetManager.getGameAssetManager().getSkin();
         if (this.skin == null) {
             Gdx.app.error("HintMenuView", "Skin is null. UI might not render correctly. Loading default.");
-            this.skin = new Skin(Gdx.files.internal("skin/pixthulhu-ui.json")); // Ensure this path is correct
+            this.skin = new Skin(Gdx.files.internal("skin/pixthulhu-ui.json"));
         }
     }
 
@@ -60,13 +60,13 @@ public class HintMenuView implements Screen {
         }
 
         contentTable = new Table(skin);
-        contentTable.pad(20f); // Increased padding for the entire content table
+        contentTable.pad(20f);
         contentTable.top().left();
 
-        // Column defaults:
-        // Col 0 (Names/Keys): Give it a reasonable minimum width, allow it to take preferred width.
-        // Col 1 (Descriptions): Should expand and fill remaining space.
-        contentTable.columnDefaults(0).minWidth(150).left().top().padRight(15); // Min width for first col, increased pad
+
+
+
+        contentTable.columnDefaults(0).minWidth(150).left().top().padRight(15);
         contentTable.columnDefaults(1).expandX().fillX().left().top();
 
 
@@ -74,7 +74,7 @@ public class HintMenuView implements Screen {
         scrollPane.setFadeScrollBars(false);
         scrollPane.setScrollingDisabled(true, false);
         scrollPane.setOverscroll(false, false);
-        scrollPane.setVariableSizeKnobs(false); // Consistent knob size
+        scrollPane.setVariableSizeKnobs(false);
 
         Label titleLabel = new Label("Game Hints & Information", skin, "title");
         if (!skin.has("title", LabelStyle.class)) {
@@ -87,13 +87,13 @@ public class HintMenuView implements Screen {
 
         Table mainLayoutTable = new Table(skin);
         mainLayoutTable.setFillParent(true);
-        mainLayoutTable.pad(10f); // Padding for the main layout table
+        mainLayoutTable.pad(10f);
         mainLayoutTable.add(titleLabel).expandX().padTop(10).padBottom(20).row();
         mainLayoutTable.add(scrollPane).expand().fill().pad(10).row();
-        mainLayoutTable.add(backButton).width(300).height(60).padTop(20).padBottom(10).row();
+        mainLayoutTable.add(backButton).width(500).height(80).padTop(20).padBottom(10).row();
 
         stage.addActor(mainLayoutTable);
-        // stage.setDebugAll(true); // Uncomment to debug layout boundaries
+
 
         if (controller != null) {
             controller.setView(this);
@@ -108,7 +108,7 @@ public class HintMenuView implements Screen {
         LabelStyle sectionTitleStyle = skin.get("subtitle", LabelStyle.class);
         if (sectionTitleStyle == null) {
             Gdx.app.log("HintMenuView", "'subtitle' LabelStyle not found. Using default for section titles.");
-            sectionTitleStyle = new LabelStyle(skin.getFont("default-font"), skin.getColor("default")); // Basic fallback
+            sectionTitleStyle = new LabelStyle(skin.getFont("default-font"), skin.getColor("default"));
         }
         LabelStyle defaultStyle = skin.get(LabelStyle.class);
         if (defaultStyle == null) {
@@ -116,11 +116,11 @@ public class HintMenuView implements Screen {
             defaultStyle = new LabelStyle(skin.getFont("default-font"), skin.getColor("default"));
         }
 
-        float itemSpacing = 8f;  // Increased spacing
+        float itemSpacing = 8f;
         float sectionTopPadding = 20f;
         float sectionBottomPadding = 10f;
 
-        // 1. Heroes Section
+
         Label heroesTitle = new Label("--- Heroes ---", sectionTitleStyle);
         contentTable.add(heroesTitle).left().padTop(sectionTopPadding).padBottom(sectionBottomPadding).colspan(2).row();
         if (heroInfo != null && !heroInfo.isEmpty()) {
@@ -129,14 +129,14 @@ public class HintMenuView implements Screen {
                 nameLabel.setWrap(true);
                 Label descLabel = new Label(hero.get("description"), defaultStyle);
                 descLabel.setWrap(true);
-                contentTable.add(nameLabel).top(); // Align to top of cell
+                contentTable.add(nameLabel).top();
                 contentTable.add(descLabel).top().padBottom(itemSpacing).row();
             }
         } else {
             contentTable.add(new Label("No hero information available.", defaultStyle)).left().colspan(2).padBottom(itemSpacing).row();
         }
 
-        // 2. Key Bindings Section
+
         Label keysTitle = new Label("--- Key Bindings ---", sectionTitleStyle);
         contentTable.add(keysTitle).left().padTop(sectionTopPadding).padBottom(sectionBottomPadding).colspan(2).row();
         if (keyBindingInfo != null && !keyBindingInfo.isEmpty()) {
@@ -152,7 +152,7 @@ public class HintMenuView implements Screen {
             contentTable.add(new Label("No key binding information available.", defaultStyle)).left().colspan(2).padBottom(itemSpacing).row();
         }
 
-        // 3. Cheat Codes Section
+
         Label cheatsTitle = new Label("--- Cheat Codes ---", sectionTitleStyle);
         contentTable.add(cheatsTitle).left().padTop(sectionTopPadding).padBottom(sectionBottomPadding).colspan(2).row();
         if (cheatCodeInfo != null && !cheatCodeInfo.isEmpty()) {
@@ -168,7 +168,7 @@ public class HintMenuView implements Screen {
             contentTable.add(new Label("No cheat code information available.", defaultStyle)).left().colspan(2).padBottom(itemSpacing).row();
         }
 
-        // 4. Abilities Section
+
         Label abilitiesTitle = new Label("--- Abilities (Level Up Rewards) ---", sectionTitleStyle);
         contentTable.add(abilitiesTitle).left().padTop(sectionTopPadding).padBottom(sectionBottomPadding).colspan(2).row();
         if (abilityInfo != null && !abilityInfo.isEmpty()) {
@@ -184,7 +184,7 @@ public class HintMenuView implements Screen {
             contentTable.add(new Label("No ability information available.", defaultStyle)).left().colspan(2).padBottom(itemSpacing).row();
         }
 
-        // contentTable.pack(); // Usually not needed when using expand/fill with ScrollPane
+
     }
 
 
@@ -204,8 +204,8 @@ public class HintMenuView implements Screen {
         if (stage != null) {
             stage.getViewport().update(width, height, true);
             if (contentTable != null) {
-                // Update column defaults based on new width
-                contentTable.columnDefaults(0).minWidth(width * 0.25f).prefWidth(width * 0.3f).left().top().padRight(15); // Adjusted prefWidth and added minWidth
+
+                contentTable.columnDefaults(0).minWidth(width * 0.25f).prefWidth(width * 0.3f).left().top().padRight(15);
                 contentTable.columnDefaults(1).expandX().fillX().left().top();
                 contentTable.invalidateHierarchy();
             }

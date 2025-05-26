@@ -22,6 +22,7 @@ public class GameOverScreen implements Screen {
     private int score;
     private GameResult gameResult;
 
+
     public enum GameResult {
         WIN,
         DIED,
@@ -29,7 +30,7 @@ public class GameOverScreen implements Screen {
     }
 
     public GameOverScreen(String username, float aliveTimeSeconds, int kills, int score, GameResult result) {
-        this.username = (username == null || username.trim().isEmpty()) ? "Player" : username; // Handle null or empty username
+        this.username = (username == null || username.trim().isEmpty()) ? "Player" : username;
         this.aliveTimeSeconds = aliveTimeSeconds;
         this.kills = kills;
         this.score = score;
@@ -68,7 +69,7 @@ public class GameOverScreen implements Screen {
         batch.begin();
 
         GlyphLayout layout = new GlyphLayout();
-        GlyphLayout userLayout = new GlyphLayout(); // For username specifically if needed below title
+        GlyphLayout userLayout = new GlyphLayout();
 
         String titleText;
         Color titleColor;
@@ -77,8 +78,6 @@ public class GameOverScreen implements Screen {
         switch (gameResult) {
             case WIN:
                 titleText = "YOU WIN!";
-                // Display username below "YOU WIN!" or as part of it.
-                // Let's display it below for better formatting.
                 userSpecificMessage = this.username + " is Victorious!";
                 titleColor = Color.GREEN;
                 break;
@@ -96,23 +95,25 @@ public class GameOverScreen implements Screen {
         layout.setText(titleFont, titleText);
         titleFont.draw(batch, layout, (Gdx.graphics.getWidth() - layout.width) / 2, Gdx.graphics.getHeight() * 0.85f);
 
-        // Display user-specific message if any (like for WIN)
         if (!userSpecificMessage.isEmpty()) {
-            font.getData().setScale(1.5f); // Slightly larger for this message
+            font.getData().setScale(1.5f);
             userLayout.setText(font, userSpecificMessage);
             font.draw(batch, userLayout, (Gdx.graphics.getWidth() - userLayout.width) / 2, Gdx.graphics.getHeight() * 0.85f - layout.height - 15);
-            font.getData().setScale(1.0f); // Reset scale for stats
+            font.getData().setScale(1.0f);
         }
 
 
         font.getData().setScale(1.2f);
         float startY = Gdx.graphics.getHeight() * 0.65f;
-        if (!userSpecificMessage.isEmpty()) { // Adjust startY if user message was shown
+        if (!userSpecificMessage.isEmpty() && gameResult == GameResult.WIN) {
             startY -= (userLayout.height + 15);
+        } else if (userSpecificMessage.isEmpty() && gameResult != GameResult.WIN) {
+            startY = Gdx.graphics.getHeight() * 0.75f - layout.height;
         }
-        float lineSpacing = 45f; // Adjusted line spacing
 
-        // Display username in stats list always
+
+        float lineSpacing = 45f;
+
         String usernameStatText = "Player: " + this.username;
         layout.setText(font, usernameStatText);
         font.draw(batch, layout, (Gdx.graphics.getWidth() - layout.width) / 2, startY);

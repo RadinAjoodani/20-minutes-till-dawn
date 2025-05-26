@@ -29,7 +29,7 @@ public class User {
 
     }
 
-    // for loading users:
+
     public User(String username, String password, String avatarPath, String securityQuestion, String securityAnswer, int score) {
         this.username = username;
         this.password = password;

@@ -1,21 +1,21 @@
-// model/Bullet.java
+
 package model;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Rectangle; // Import Rectangle
+import com.badlogic.gdx.math.Rectangle;
 
 public class Bullet {
     private float x, y;
     private float speed;
-    private float dirX, dirY; // Direction vector
+    private float dirX, dirY;
     private TextureRegion textureRegion;
     private float width, height;
-    private int damage; // NEW: Damage value for the bullet
+    private int damage;
 
     public Bullet(float x, float y, float speed, float dirX, float dirY,
                   TextureRegion textureRegion, float width, float height,
-                  int damage) { // NEW: Constructor now accepts damage
+                  int damage) {
         this.x = x;
         this.y = y;
         this.speed = speed;
@@ -24,7 +24,7 @@ public class Bullet {
         this.textureRegion = textureRegion;
         this.width = width;
         this.height = height;
-        this.damage = damage; // Set the damage
+        this.damage = damage;
     }
 
     public void update(float delta) {
@@ -52,11 +52,11 @@ public class Bullet {
         return height;
     }
 
-    public int getDamage() { // NEW: Getter for damage
+    public int getDamage() {
         return damage;
     }
 
-    public Rectangle getBounds() { // NEW: getBounds method
+    public Rectangle getBounds() {
         return new Rectangle(x, y, width, height);
     }
 }

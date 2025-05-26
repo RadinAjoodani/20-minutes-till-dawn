@@ -22,8 +22,8 @@ import model.GameSettings;
 
 import java.util.Map;
 import java.util.HashMap;
-import java.util.function.BiConsumer; // Import BiConsumer
-import java.util.function.Consumer;   // Import Consumer
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 
 public class PauseMenuView implements Screen {
@@ -108,9 +108,9 @@ public class PauseMenuView implements Screen {
         hintsScrollPane.setVisible(false);
 
         mainTable.add(titleLabel).padBottom(30).colspan(1).row();
-        mainTable.add(resumeButton).width(300).height(50).padBottom(15).row();
-        mainTable.add(giveUpButton).width(300).height(50).padBottom(15).row();
-        mainTable.add(toggleHintsButton).width(300).height(50).padBottom(15).row();
+        mainTable.add(resumeButton).width(300).height(80).padBottom(15).row();
+        mainTable.add(giveUpButton).width(500).height(80).padBottom(15).row();
+        mainTable.add(toggleHintsButton).width(300).height(80).padBottom(15).row();
         mainTable.add(hintsScrollPane).expand().fill().pad(10).minHeight(200).maxHeight(Gdx.graphics.getHeight() * 0.4f).row();
 
 
@@ -149,7 +149,7 @@ public class PauseMenuView implements Screen {
         float sectionTopPadding = 15f;
         float sectionBottomPadding = 8f;
 
-        // Corrected Helper Lambdas
+
         LabelStyle finalSectionTitleStyle = sectionTitleStyle;
         Consumer<String> addSectionTitle = (String titleText) -> {
             Label title = new Label(titleText, finalSectionTitleStyle);

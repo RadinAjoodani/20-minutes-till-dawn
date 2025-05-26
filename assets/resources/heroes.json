@@ -2,7 +2,7 @@
   {
     "name": "Dasher",
     "speed": 10,
-    "hp": 100000000,
+    "hp": 100,
     "animations": {
       "idle": [
         "heroes/Dasher/idle/Idle_0.png",

@@ -1,4 +1,4 @@
-// model/GameAssetManager.java
+
 package model;
 
 import com.badlogic.gdx.Gdx;
@@ -6,7 +6,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Animation; // Import LibGDX Animation
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Json;
@@ -30,11 +30,11 @@ public class GameAssetManager {
     private Array<CharacterData> allCharacters;
     private Array<GunData> allGuns;
     private Array<EnemyData> allEnemies;
-    private Array<DamageAnimationData> allDamageAnimationsData; // For damages.json
+    private Array<DamageAnimationData> allDamageAnimationsData;
 
-    // Store loaded animations
-    private ObjectMap<String, Animation<TextureRegion>> playerDamageAnimations; // Keyed by type, e.g., "Player_damage"
-    private ObjectMap<String, Animation<TextureRegion>> enemyDamageAnimations;  // Keyed by type, e.g., "Enemy_damage"
+
+    private ObjectMap<String, Animation<TextureRegion>> playerDamageAnimations;
+    private ObjectMap<String, Animation<TextureRegion>> enemyDamageAnimations;
 
 
     public final String BULLET_TEXTURE_PATH = "guns/bullet.png";
@@ -58,13 +58,13 @@ public class GameAssetManager {
         loadHeroes();
         loadGuns();
         loadEnemies();
-        loadDamageAnimationsFromJson("resources/damages.json"); // Load damage animations
+        loadDamageAnimationsFromJson("resources/damages.json");
         loadGameAssets();
 
-        assetManager.finishLoading(); // Important: ensure all assets are loaded
+        assetManager.finishLoading();
         Gdx.app.log("GameAssetManager", "All assets finished loading.");
 
-        // After loading, create actual Animation objects
+
         createLoadedPlayerDamageAnimations();
         createLoadedEnemyDamageAnimations();
     }
@@ -78,7 +78,7 @@ public class GameAssetManager {
 
     private void loadOtherAssets() {
         Json json = new Json();
-        // Load avatars, backgrounds, musics as before...
+
         FileHandle avatarsFile = Gdx.files.internal("resources/avatars.json");
         if (avatarsFile.exists()) {
             Array<String> avatarFiles = json.fromJson(Array.class, avatarsFile);
@@ -115,7 +115,7 @@ public class GameAssetManager {
             if (musicFiles != null) {
                 for (String filePath : musicFiles) {
                     String fullPath = MUSIC_FOLDER + filePath;
-                    // For music, type is Music.class, not Texture.class
+
                     if (Gdx.files.internal(fullPath).exists()) {
                         assetManager.load(fullPath, Music.class);
                         musicPaths.add(fullPath);
@@ -196,7 +196,7 @@ public class GameAssetManager {
 
         for (DamageAnimationData dad : allDamageAnimationsData) {
             if (dad.animations != null) {
-                for (ObjectMap.Entry<String, Array<String>> entry : dad.animations.entries()) { // e.g., key "damage"
+                for (ObjectMap.Entry<String, Array<String>> entry : dad.animations.entries()) {
                     Array<String> animationPaths = entry.value;
                     if (animationPaths != null) {
                         for (String path : animationPaths) {

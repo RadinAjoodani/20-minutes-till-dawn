@@ -1,4 +1,4 @@
-// model/GunData.java
+
 package model;
 
 import com.badlogic.gdx.utils.Array;
@@ -7,13 +7,13 @@ import com.badlogic.gdx.utils.ObjectMap;
 public class GunData {
     private String name;
     private int damage;
-    private int projectile; // NEW: Number of projectiles per shot
-    private float fire_rate; // This field exists in your JSON, but not used in `GameScreen` for shoot timing
-    private float reload_time; // This is the cooldown between shots
-    private int max_ammo; // NEW: Maximum ammunition for the gun
+    private int projectile;
+    private float fire_rate;
+    private float reload_time;
+    private int max_ammo;
     private ObjectMap<String, Array<String>> animations;
 
-    // Getters
+
     public String getName() {
         return name;
     }
@@ -42,7 +42,7 @@ public class GunData {
         return animations;
     }
 
-    // Setters (if needed for runtime changes, though often not for immutable data)
+
     public void setName(String name) {
         this.name = name;
     }

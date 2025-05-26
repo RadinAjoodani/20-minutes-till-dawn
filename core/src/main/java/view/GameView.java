@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
@@ -94,6 +95,8 @@ public class GameView implements Screen {
     private Table abilityTable;
     private Array<Ability> offeredAbilities;
 
+    private ShaderProgram grayscaleShader;
+
 
     public GameView(Player player, Gun gun, int gameDurationMinutes, GameSettings gameSettings, String username) {
         this.player = player;
@@ -141,6 +144,29 @@ public class GameView implements Screen {
         gameCamera = new OrthographicCamera();
         gameCamera.setToOrtho(false, GdxWidth, GdxHeight);
         uiProjectionMatrix = new Matrix4().setToOrtho2D(0, 0, GdxWidth, GdxHeight);
+
+
+
+        try {
+
+
+            String vertexShader = Gdx.files.internal("shaders/grayscale.vert").readString();
+            String fragmentShader = Gdx.files.internal("shaders/grayscale.frag").readString();
+            grayscaleShader = new ShaderProgram(vertexShader, fragmentShader);
+
+            if (!grayscaleShader.isCompiled()) {
+                Gdx.app.error("ShaderError", "Grayscale shader failed to compile:\n" + grayscaleShader.getLog());
+                if (grayscaleShader != null) grayscaleShader.dispose();
+                grayscaleShader = null;
+            } else {
+                Gdx.app.log("ShaderInfo", "Grayscale shader compiled successfully.");
+            }
+        } catch (Exception e) {
+            Gdx.app.error("ShaderError", "Exception loading/compiling grayscale shader.", e);
+            if (grayscaleShader != null) grayscaleShader.dispose();
+            grayscaleShader = null;
+        }
+
 
         if (uiStage == null) uiStage = new Stage(new ScreenViewport(), batch);
         else uiStage.getViewport().update((int)GdxWidth, (int)GdxHeight, true);
@@ -261,30 +287,49 @@ public class GameView implements Screen {
         }
     }
     public void triggerGiveUp() {
-        if (!gameOver) { this.currentGameState = GamePlayState.ENDING; this.gameOver = true; endGameAndShowScreen(GameResult.GAVE_UP); }
+        if (!gameOver) {
+            endGameAndShowScreen(GameResult.GAVE_UP);
+        } else {
+            Gdx.app.log("GameView", "triggerGiveUp called but game is already over or ending.");
+        }
     }
     private void endGameAndShowScreen(GameResult result) {
-        this.gameOver = true; this.currentGameState = GamePlayState.ENDING;
-        int finalScoreValue = 0; int kills = (enemyController != null) ? enemyController.getEnemiesKilled() : 0;
+        if (this.currentGameState == GamePlayState.ENDING && this.gameOver) {
+            Gdx.app.log("GameView", "endGameAndShowScreen called again while already ending. Ignoring. Result: " + result.name());
+            return;
+        }
+
+        this.gameOver = true;
+        this.currentGameState = GamePlayState.ENDING;
+        Gdx.app.log("GameView", "Ending game with result: " + result.name() + ". Saving stats.");
+
+        int finalScoreValue = 0;
+        int kills = (enemyController != null) ? enemyController.getEnemiesKilled() : 0;
         float timeAlive = gameElapsedTimeSeconds;
+
         User currentUser = App.getInstance().getCurrentUser();
         if (currentUser != null) {
             currentUser.setTotalKill(currentUser.getTotalKill() + kills);
-            if ((int)timeAlive > currentUser.getMaximumTimeAlive()) currentUser.setMaximumTimeAlive((int)timeAlive);
-            if (result == GameResult.WIN || result == GameResult.DIED) { // Only add to cumulative score if not giving up
+            if ((int)timeAlive > currentUser.getMaximumTimeAlive()) {
+                currentUser.setMaximumTimeAlive((int)timeAlive);
+            }
+            if (result == GameResult.WIN || result == GameResult.DIED) {
                 int sessionScore = (int)(timeAlive * kills * 0.1f) + kills * 10;
                 currentUser.setScore(currentUser.getScore() + sessionScore);
             }
-            App.getInstance().saveUsers(); finalScoreValue = currentUser.getScore();
-        } else if (player != null) finalScoreValue = (int)(timeAlive * kills * 0.1f) + kills * 10;
+            App.getInstance().saveUsers();
+            finalScoreValue = currentUser.getScore();
+        } else if (player != null) {
+            finalScoreValue = (int)(timeAlive * kills * 0.1f) + kills * 10;
+        }
 
         final GameResult finalResultToPass = result;
         final int finalScoreForScreen = finalScoreValue;
-        final String playerUsername = (this.username == null || this.username.trim().isEmpty()) ? "Player" : this.username;
+        final String playerUsernameToShow = (this.username == null || this.username.trim().isEmpty()) ? "Player" : this.username;
 
         Gdx.app.postRunnable(() -> {
-            if (Main.getMain().getScreen() instanceof GameView || Main.getMain().getScreen() == null)
-                Main.getMain().setScreen(new view.GameOverScreen(playerUsername, timeAlive, kills, finalScoreForScreen, finalResultToPass));
+            Gdx.app.log("GameView", "Executing postRunnable to set GameOverScreen. Current main screen: " + (Main.getMain().getScreen() != null ? Main.getMain().getScreen().getClass().getSimpleName() : "null"));
+            Main.getMain().setScreen(new view.GameOverScreen(playerUsernameToShow, timeAlive, kills, finalScoreForScreen, finalResultToPass));
         });
     }
 
@@ -334,8 +379,16 @@ public class GameView implements Screen {
         gameCamera.position.y = worldPlayerPosition.y;
         gameCamera.update();
 
+
+        if (gameSettings != null && gameSettings.isBlackAndWhiteModeEnabled() && grayscaleShader != null && grayscaleShader.isCompiled()) {
+            batch.setShader(grayscaleShader);
+        } else {
+            batch.setShader(null);
+        }
+
         batch.setProjectionMatrix(gameCamera.combined);
         batch.begin();
+
         if (backgroundTexture != null) {
             float cameraWorldLeft = gameCamera.position.x - gameCamera.viewportWidth / 2;
             float cameraWorldBottom = gameCamera.position.y - gameCamera.viewportHeight / 2;
@@ -388,6 +441,8 @@ public class GameView implements Screen {
         enemyController.draw(batch);
         batch.end();
 
+        batch.setShader(null);
+
         batch.setProjectionMatrix(uiProjectionMatrix);
         batch.begin();
         if (uiFont != null && player != null && player.getCharacterData() != null && gun != null && gun.getGunData() != null && enemyController != null && bulletTextureRegion != null) {
@@ -414,7 +469,7 @@ public class GameView implements Screen {
         }
         batch.end();
 
-        if (!gameOver && currentGameState != GamePlayState.ABILITY_SELECTION) {
+        if (!gameOver && currentGameState != GamePlayState.ABILITY_SELECTION && currentGameState != GamePlayState.USER_PAUSED) {
             uiStage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
             uiStage.draw();
         }
@@ -441,8 +496,12 @@ public class GameView implements Screen {
         if (uiStage != null) { uiStage.getViewport().update(width, height, true);
             if (pauseButton != null) pauseButton.setPosition(width - pauseButton.getWidth() - UI_SIDE_MARGIN, height - pauseButton.getHeight() - UI_TOP_MARGIN);
         }
-        if (abilitySelectionStage != null) { abilitySelectionStage.getViewport().update(width, height, true);
-            if (abilityTable != null && abilityTable.getParent().equals(abilitySelectionStage)) { abilityTable.invalidateHierarchy(); abilityTable.pack(); }
+        if (abilitySelectionStage != null) {
+            abilitySelectionStage.getViewport().update(width, height, true);
+            if (abilityTable != null && abilityTable.getStage() == abilitySelectionStage) {
+                abilityTable.invalidateHierarchy();
+                abilityTable.pack();
+            }
         }
     }
     @Override
@@ -471,6 +530,8 @@ public class GameView implements Screen {
         if (uiFont != null) { uiFont.dispose(); uiFont = null; }
         if (uiStage != null) { uiStage.dispose(); uiStage = null; }
         if (abilitySelectionStage != null) { abilitySelectionStage.dispose(); abilitySelectionStage = null; }
+        if (grayscaleShader != null) { grayscaleShader.dispose(); grayscaleShader = null; }
+
         if (bulletTextureRegion != null && bulletTextureRegion.getTexture() != null) {
             Texture tex = bulletTextureRegion.getTexture();
             if (tex.getWidth() == 1 && tex.getHeight() == 1) {
@@ -508,13 +569,15 @@ public class GameView implements Screen {
             if (gameSettings == null) return false;
             Integer pauseKey = gameSettings.getKeyBindings().get("Pause");
             if (pauseKey != null && keycode == pauseKey) { if (currentGameState == GamePlayState.PLAYING) togglePause(); return true; }
+
             if(currentGameState == GamePlayState.USER_PAUSED && Main.getMain().getScreen() != GameView.this) return false;
+
             if (currentGameState == GamePlayState.PLAYING) {
                 if (keycode == Input.Keys.NUM_1) {
-                    long timeToReduceNanos = 60 * 1_000_000_000L; gameStartTime += timeToReduceNanos;
-                    if (TimeUtils.nanoTime() < gameStartTime) gameStartTime = TimeUtils.nanoTime();
+                    long timeToAdjustNanos = 60 * 1_000_000_000L;
+                    gameStartTime -= timeToAdjustNanos;
                     gameElapsedTimeSeconds = (TimeUtils.nanoTime() - gameStartTime) / 1_000_000_000.0f;
-                    Gdx.app.log("CHEAT", "Time reduced. New elapsed: " + gameElapsedTimeSeconds); return true;
+                    Gdx.app.log("CHEAT", "Time advanced by 1 minute. New elapsed: " + gameElapsedTimeSeconds); return true;
                 } else if (keycode == Input.Keys.NUM_2 && player != null) {
                     player.addXp(player.getXpToNextLevel() - player.getXp() + 1);
                     Gdx.app.log("CHEAT", "Player leveled up. New level: " + player.getLevel()); return true;

@@ -1,31 +1,31 @@
-// model/Gun.java
+
 package model;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.utils.Array; // Import Gdx Array
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 
-// Re-use ActiveBuff from Player.java or define a similar one here if preferred
-// For this example, assuming ActiveBuff can be used or adapted.
-// class ActiveGunBuff {
-//     public Ability ability;
-//     public float durationRemaining;
-//     public float originalValue; // For damage multiplier
-//     public ActiveGunBuff(Ability ability, float duration, float originalValue) { /* ... */ }
-// }
+
+
+
+
+
+
+
+
 
 public class Gun {
-    private GunData gunData; // Base stats
+    private GunData gunData;
     private ObjectMap<String, Animation<TextureRegion>> animations;
 
-    // Current operational stats, can be modified by abilities
+
     private int currentMaxAmmo;
     private int currentAmmo;
     private int currentProjectiles;
-    private float baseDamage; // From GunData
-    private float currentDamageMultiplier; // For Damager buff
+    private float baseDamage;
+    private float currentDamageMultiplier;
 
     private boolean isReloading;
     private float reloadStateTime;
@@ -39,24 +39,24 @@ public class Gun {
         if (gunData != null) {
             this.baseDamage = gunData.getDamage();
             this.currentMaxAmmo = gunData.getMax_ammo();
-            this.currentAmmo = this.currentMaxAmmo; // Initialize with max ammo
+            this.currentAmmo = this.currentMaxAmmo;
             this.currentProjectiles = gunData.getProjectile();
         } else {
             Gdx.app.error("Gun", "GunData is null, cannot initialize gun stats properly.");
-            // Set default/fallback values
+
             this.baseDamage = 1;
             this.currentMaxAmmo = 10;
             this.currentAmmo = 10;
             this.currentProjectiles = 1;
         }
 
-        this.currentDamageMultiplier = 1.0f; // No buff initially
+        this.currentDamageMultiplier = 1.0f;
         this.isReloading = false;
-        this.reloadStateTime = 0f; // Initialize to 0, not gunData.getReload_time()
+        this.reloadStateTime = 0f;
         this.activeDamageBuffs = new Array<>();
     }
 
-    public GunData getGunData() { // Returns base data
+    public GunData getGunData() {
         return gunData;
     }
 
@@ -84,16 +84,16 @@ public class Gun {
     public void shoot() {
         if (currentAmmo > 0 && !isReloading) {
             currentAmmo--;
-            // Gdx.app.log("Gun", "Fired " + gunData.getName() + ", Ammo left: " + currentAmmo);
+
         } else if (currentAmmo == 0) {
-            // Gdx.app.log("Gun", gunData.getName() + " is out of ammo. Reload!");
+
         } else if (isReloading) {
-            // Gdx.app.log("Gun", gunData.getName() + " is reloading...");
+
         }
     }
 
     public void startReload() {
-        if (!isReloading && currentAmmo < currentMaxAmmo) { // Use currentMaxAmmo
+        if (!isReloading && currentAmmo < currentMaxAmmo) {
             isReloading = true;
             reloadStateTime = 0f;
             Gdx.app.log("Gun", (gunData != null ? gunData.getName() : "Unknown Gun") + " started reloading.");
@@ -103,8 +103,8 @@ public class Gun {
     public void updateReload(float delta) {
         if (isReloading) {
             reloadStateTime += delta;
-            // Determine reload duration: from animation if present, else from GunData
-            float actualReloadTime = gunData != null ? gunData.getReload_time() : 2.0f; // Default reload time if gunData is null
+
+            float actualReloadTime = gunData != null ? gunData.getReload_time() : 2.0f;
             Animation<TextureRegion> reloadAnimation = animations != null ? animations.get("reload") : null;
 
             if (reloadAnimation != null) {
@@ -119,7 +119,7 @@ public class Gun {
 
     private void finishReload() {
         isReloading = false;
-        currentAmmo = currentMaxAmmo; // Reload to currentMaxAmmo
+        currentAmmo = currentMaxAmmo;
         Gdx.app.log("Gun", (gunData != null ? gunData.getName() : "Unknown Gun") + " finished reloading. Ammo: " + currentAmmo);
     }
 
@@ -131,15 +131,15 @@ public class Gun {
         return reloadStateTime;
     }
 
-    // --- Ability Effects ---
+
     public void applyDamageBuff(float percentageIncrease, float duration) {
-        // Simple approach: this buff overrides previous ones.
-        // Could be made stackable or to refresh existing.
+
+
         for(int i = activeDamageBuffs.size - 1; i >= 0; i--) {
             ActiveBuff oldBuff = activeDamageBuffs.get(i);
-            if (oldBuff.ability == Ability.DAMAGER) { // Assuming ActiveBuff has an ability field
-                // Revert effect of old Damager buff if it directly set multiplier based on baseDamage
-                // Here, we just clear and apply new. If multiplier was additive, revert would be different.
+            if (oldBuff.ability == Ability.DAMAGER) {
+
+
                 activeDamageBuffs.removeIndex(i);
             }
         }

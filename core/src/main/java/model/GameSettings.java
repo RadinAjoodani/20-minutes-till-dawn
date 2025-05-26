@@ -1,4 +1,4 @@
-// model/GameSettings.java
+
 package model;
 
 import com.badlogic.gdx.Gdx;
@@ -17,6 +17,7 @@ public class GameSettings {
 
     private ObjectMap<String, Integer> keyBindings;
     private boolean autoReloadEnabled;
+    private boolean blackAndWhiteModeEnabled = false;
 
     public GameSettings() {
         keyBindings = new ObjectMap<>();
@@ -24,17 +25,15 @@ public class GameSettings {
         keyBindings.put("Move Left", Input.Keys.A);
         keyBindings.put("Move Down", Input.Keys.S);
         keyBindings.put("Move Right", Input.Keys.D);
-        keyBindings.put("Shoot", Input.Buttons.LEFT); // Changed to Mouse Left for clarity
-        // keyBindings.put("Jump", Input.Keys.SPACE); // Jump was SPACE, Shoot was SPACE. Changed Shoot.
+        keyBindings.put("Shoot", Input.Buttons.LEFT);
         keyBindings.put("Reload", Input.Keys.R);
-        keyBindings.put("Pause", Input.Keys.ESCAPE); // NEW: Pause Key
+        keyBindings.put("Pause", Input.Keys.ESCAPE);
 
         this.autoReloadEnabled = false;
 
         Array<String> availableTracks = getAvailableTracks();
         if (currentMusicTrackName == null && availableTracks.size > 0) {
             currentMusicTrackName = availableTracks.first();
-            // playMusicTrack(currentMusicTrackName); // Music might be better started by MainMenu
         }
     }
 
@@ -86,12 +85,11 @@ public class GameSettings {
         if (currentMusic != null) {
             currentMusic.stop();
             Gdx.app.log("GameSettings", "Music stopped.");
-            // Optionally dispose here if music is not resumed later, or let dispose() handle it
         }
     }
 
     public void setMusicVolume(float musicVolume) {
-        this.musicVolume = MathUtils.clamp(musicVolume, 0f, 1f); // Clamp volume
+        this.musicVolume = MathUtils.clamp(musicVolume, 0f, 1f);
         if (currentMusic != null) {
             currentMusic.setVolume(this.musicVolume);
         }
@@ -119,10 +117,10 @@ public class GameSettings {
         if (trackName != null && !trackName.equals(currentMusicTrackName)) {
             playMusicTrack(trackName);
         } else if (trackName == null && currentMusicTrackName != null) {
-            stopMusic(); // Stop if new track is null
+            stopMusic();
             currentMusicTrackName = null;
         } else if (trackName != null && currentMusic == null) {
-            playMusicTrack(trackName); // Play if music was stopped/null but a track is set
+            playMusicTrack(trackName);
         }
     }
 
@@ -142,7 +140,6 @@ public class GameSettings {
                 return;
             }
         } else {
-            // For other actions, prevent mouse buttons from being assigned to keyboard actions
             if (keyCode == Input.Buttons.LEFT || keyCode == Input.Buttons.RIGHT || keyCode == Input.Buttons.MIDDLE) {
                 Gdx.app.error("GameSettings", "Cannot set mouse button for keyboard action '" + action + "'. Key: " + getKeyName(keyCode));
                 return;
@@ -162,11 +159,21 @@ public class GameSettings {
         Gdx.app.log("GameSettings", "Auto-Reload set to: " + autoReloadEnabled);
     }
 
+
+    public boolean isBlackAndWhiteModeEnabled() {
+        return blackAndWhiteModeEnabled;
+    }
+
+    public void setBlackAndWhiteModeEnabled(boolean blackAndWhiteModeEnabled) {
+        this.blackAndWhiteModeEnabled = blackAndWhiteModeEnabled;
+        Gdx.app.log("GameSettings", "Black and White Mode set to: " + blackAndWhiteModeEnabled);
+    }
+
+
     public static String getKeyName(int keyCode) {
         if (keyCode == Input.Buttons.LEFT) return "Mouse Left";
         if (keyCode == Input.Buttons.RIGHT) return "Mouse Right";
         if (keyCode == Input.Buttons.MIDDLE) return "Mouse Middle";
-        // For any other button codes that might be non-standard.
         if (keyCode >= Input.Keys.BUTTON_A && keyCode <= Input.Keys.BUTTON_MODE) return "Mouse Button " + (keyCode - Input.Keys.BUTTON_A);
 
         String keyName = Input.Keys.toString(keyCode);

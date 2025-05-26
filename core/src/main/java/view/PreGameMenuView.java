@@ -3,6 +3,7 @@ package view;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -22,9 +23,10 @@ public class PreGameMenuView implements Screen {
     private final Label chooseDurationLabel;
     private final SelectBox<Integer> durationSelectBox;
     private final TextButton backButton;
-    private final TextButton playGameButton; // NEW
+    private final TextButton playGameButton;
     private final Table table;
     private final Skin skin;
+    private Image backgroundImage;
 
     public PreGameMenuView(PreGameMenuController controller, Skin skin) {
         this.skin = skin;
@@ -36,11 +38,11 @@ public class PreGameMenuView implements Screen {
         this.chooseDurationLabel = new Label("Game Duration: ", skin);
         this.durationSelectBox = new SelectBox<>(skin);
         this.backButton = new TextButton("Back", skin);
-        this.playGameButton = new TextButton("Play Game", skin); // NEW
+        this.playGameButton = new TextButton("Play Game", skin);
 
         this.table = new Table(skin);
 
-        // Populate hero names
+
         Array<String> heroNames = GameAssetManager.getGameAssetManager().getAllCharacterNames();
         if (heroNames.size > 0) {
             heroSelectBox.setItems(heroNames);
@@ -50,7 +52,7 @@ public class PreGameMenuView implements Screen {
             heroSelectBox.setItems("No Heroes Available");
         }
 
-        // Populate gun names
+
         Array<String> gunNames = GameAssetManager.getGameAssetManager().getAllGunNames();
         if (gunNames.size > 0) {
             gunSelectBox.setItems(gunNames);
@@ -60,14 +62,14 @@ public class PreGameMenuView implements Screen {
             gunSelectBox.setItems("No Guns Available");
         }
 
-        // Populate duration options
+
         Array<Integer> durations = new Array<>();
         durations.add(2);
         durations.add(5);
         durations.add(10);
         durations.add(20);
         durationSelectBox.setItems(durations);
-        durationSelectBox.setSelected(5); // Default to 5 minutes
+        durationSelectBox.setSelected(5);
 
         controller.setView(this);
     }
@@ -76,6 +78,16 @@ public class PreGameMenuView implements Screen {
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
 
+        Texture backgroundTexture = GameAssetManager.getGameAssetManager()
+            .getTexture(GameAssetManager.getGameAssetManager()
+                .getRandomBackgroundPath());
+
+        if (backgroundTexture != null) {
+            backgroundImage = new Image(backgroundTexture);
+            backgroundImage.setFillParent(true);
+            stage.addActor(backgroundImage);
+        }
+
         table.clear();
         table.setFillParent(true);
         table.center();
@@ -83,17 +95,17 @@ public class PreGameMenuView implements Screen {
         table.add(menuLabel).colspan(3).padBottom(30).row();
 
         table.add(chooseHeroLabel).padRight(10).left();
-        table.add(heroSelectBox).width(200).colspan(2).row();
+        table.add(heroSelectBox).width(400).colspan(2).row();
 
         table.add(chooseGunLabel).padRight(10).left().padTop(15);
-        table.add(gunSelectBox).width(200).colspan(2).row();
+        table.add(gunSelectBox).width(400).colspan(2).row();
 
         table.add(chooseDurationLabel).padRight(10).left().padTop(15);
-        table.add(durationSelectBox).width(200).colspan(2).row();
+        table.add(durationSelectBox).width(400).colspan(2).row();
 
-        // NEW: Add Play Game button
-        table.add(playGameButton).width(150).height(40).padTop(30).colspan(3).row();
-        table.add(backButton).width(100).height(40).padTop(10).colspan(3).row();
+
+        table.add(playGameButton).width(300).height(60).padTop(30).colspan(3).row();
+        table.add(backButton).width(300).height(60).padTop(10).colspan(3).row();
 
         stage.addActor(table);
         table.pack();
@@ -126,7 +138,7 @@ public class PreGameMenuView implements Screen {
     }
 
     public TextButton getBackButton() { return backButton; }
-    public TextButton getPlayGameButton() { return playGameButton; } // NEW
+    public TextButton getPlayGameButton() { return playGameButton; }
     public SelectBox<String> getHeroSelectBox() { return heroSelectBox; }
     public SelectBox<String> getGunSelectBox() { return gunSelectBox; }
     public SelectBox<Integer> getDurationSelectBox() { return durationSelectBox; }

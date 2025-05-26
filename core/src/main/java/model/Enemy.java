@@ -28,7 +28,7 @@ public class Enemy {
     private static final float DASH_DURATION = 3.0f;
     private static final float DASH_SPEED_MULTIPLIER = 8f;
     private Vector2 dashTargetPosition = null;
-    private Vector2 dashDirection = null; // Added this field back
+    private Vector2 dashDirection = null;
     private static final float BOSS_DRAW_WIDTH = 160f;
     private static final float BOSS_DRAW_HEIGHT = 160f;
 
@@ -148,7 +148,7 @@ public class Enemy {
         isDashing = true;
         dashTimer = 0f;
         this.dashTargetPosition = new Vector2(targetPlayerX, targetPlayerY);
-        this.dashDirection = new Vector2(targetPlayerX - x, targetPlayerY - y).nor(); // Ensure dashDirection is initialized
+        this.dashDirection = new Vector2(targetPlayerX - x, targetPlayerY - y).nor();
         Gdx.app.log(getName(), "Started dash towards (" + targetPlayerX + ", " + targetPlayerY + ") with direction (" + dashDirection.x + ", " + dashDirection.y + ")");
     }
 
@@ -202,7 +202,7 @@ public class Enemy {
             }
             return true;
         }
-        // If not dying but HP is <= 0 (e.g. no death animation), it's considered "finished" in terms of being dead.
+
         return !isDying && currentHp <= 0;
     }
 

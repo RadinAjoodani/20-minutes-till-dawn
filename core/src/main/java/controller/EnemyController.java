@@ -41,12 +41,12 @@ public class EnemyController {
     private final String TREE_ENEMY_NAME = "Tree";
     private int initialTreeCount = 2;
 
-    // --- Boss Specific Fields ---
+
     private final String BOSS_ENEMY_NAME = "Boss";
     private boolean bossHasSpawned = false;
-    private float bossSpawnTimeThreshold; // Half of game duration
+    private float bossSpawnTimeThreshold;
     private float bossDashAbilityTimer = 0f;
-    private static final float BOSS_DASH_COOLDOWN = 5.0f; // Boss dashes every 5 seconds
+    private static final float BOSS_DASH_COOLDOWN = 5.0f;
 
     private Array<Bullet> enemyBullets;
     private TextureRegion enemyBulletTextureRegion;
@@ -57,7 +57,7 @@ public class EnemyController {
     private TextureRegion seedTextureRegion;
 
     private int enemiesKilled = 0;
-    private float stateTimeForPlayerBounds = 0f; // Separate state time for player bounds in this controller context
+    private float stateTimeForPlayerBounds = 0f;
 
     public EnemyController(GameAssetManager assetManager, Player player, float gameTotalDurationMinutes) {
         this.assetManager = assetManager;
@@ -76,7 +76,7 @@ public class EnemyController {
             Gdx.app.error("EnemyController", "Game total duration is zero or negative, defaulting to 1s.");
         }
         this.eyeBatSpawnStartTime = this.gameTotalDurationSeconds / 4f;
-        this.bossSpawnTimeThreshold = this.gameTotalDurationSeconds / 2f; // Boss spawns at half game time
+        this.bossSpawnTimeThreshold = this.gameTotalDurationSeconds / 2f;
 
         Texture bulletTexture = assetManager.getTexture(assetManager.BULLET_TEXTURE_PATH);
         if (bulletTexture != null) enemyBulletTextureRegion = new TextureRegion(bulletTexture);
@@ -102,21 +102,21 @@ public class EnemyController {
     public void update(float delta, float gameElapsedTimeSeconds) {
         stateTimeForPlayerBounds += delta;
 
-        // --- Boss Spawning Logic ---
+
         if (!bossHasSpawned && gameElapsedTimeSeconds >= bossSpawnTimeThreshold) {
             Gdx.app.log("EnemyController", "Half game time reached. Attempting to spawn Boss near player.");
-            spawnSpecificEnemyAtRandomPosition(BOSS_ENEMY_NAME); // Changed to spawn near player
+            spawnSpecificEnemyAtRandomPosition(BOSS_ENEMY_NAME);
             bossHasSpawned = true;
         }
 
-        // --- Boss Dashing Logic ---
+
         if (bossHasSpawned) {
             bossDashAbilityTimer += delta;
             if (bossDashAbilityTimer >= BOSS_DASH_COOLDOWN) {
                 for (Enemy enemy : activeEnemies) {
                     if (enemy.getName().equals(BOSS_ENEMY_NAME) && enemy.isAlive() && !enemy.isDashing() && !enemy.isDying()) {
                         Gdx.app.log("EnemyController", "Boss attempting dash.");
-                        enemy.startDash(player.getX(), player.getY()); // Dash towards current player position
+                        enemy.startDash(player.getX(), player.getY());
                         break;
                     }
                 }
@@ -124,7 +124,7 @@ public class EnemyController {
             }
         }
 
-        // Tentacle Monster Spawning Logic
+
         tentacleMonsterSpawnTimer += delta;
         if (tentacleMonsterSpawnTimer >= tentacleMonsterSpawnInterval) {
             int numToSpawn = (int) (gameElapsedTimeSeconds / 30.0f);

@@ -1,4 +1,4 @@
-// model/Seed.java
+
 package model;
 
 import com.badlogic.gdx.graphics.Texture;
@@ -6,14 +6,12 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 
-/**
- * Represents a collectible seed dropped by a defeated enemy.
- */
+
 public class Seed {
     private float x, y;
     private TextureRegion textureRegion;
-    private int xpValue; // How much XP this seed grants
-    private static final float DRAW_SIZE = 30f; // Standard size for the seed
+    private int xpValue;
+    private static final float DRAW_SIZE = 30f;
 
     public Seed(float x, float y, TextureRegion textureRegion, int xpValue) {
         this.x = x;

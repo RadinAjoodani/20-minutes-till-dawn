@@ -1,7 +1,7 @@
 package model;
 
 public enum Ability {
-    // Enum constants with display name and description
+
     VITALITY("Vitality", "Increases Max Health by 1 HP permanently."),
     DAMAGER("Damager", "Increases current gun damage by 25% for 10 seconds."),
     PROCREASE("Procrease", "Adds 1 projectile to the current gun permanently."),
@@ -24,8 +24,8 @@ public enum Ability {
         return description;
     }
 
-    // Optional: Add type, duration, etc., if needed for more complex logic later
-    // public enum AbilityType { PERMANENT, TIMED_BUFF }
-    // private AbilityType type;
-    // private float duration; // in seconds, for timed buffs
+
+
+
+
 }

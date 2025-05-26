@@ -1,4 +1,4 @@
-// model/Player.java
+
 package model;
 
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -24,7 +24,7 @@ class ActiveBuff {
 public class Player {
     private CharacterData characterData;
     private Animation<TextureRegion> idleAnimation;
-    private Animation<TextureRegion> damageAnimation; // Player's damage animation
+    private Animation<TextureRegion> damageAnimation;
 
     private float x, y;
     private float baseSpeed;
@@ -38,7 +38,7 @@ public class Player {
     private boolean justLeveledUp = false;
     private Array<ActiveBuff> activeSpeedBuffs;
 
-    // Damage animation state
+
     private boolean isTakingDamage = false;
     private float damageAnimationStateTime = 0f;
 
@@ -73,7 +73,7 @@ public class Player {
         this.activeSpeedBuffs = new Array<>();
     }
 
-    // Call this method in GameView's render loop for the player
+
     public void update(float delta) {
         updateBuffs(delta);
         if (isTakingDamage) {
@@ -90,12 +90,12 @@ public class Player {
     public Animation<TextureRegion> getIdleAnimation() { return idleAnimation; }
     public Animation<TextureRegion> getDamageAnimation() { return damageAnimation; }
 
-    public TextureRegion getCurrentFrame(float stateTime) { // GameView will call this
+    public TextureRegion getCurrentFrame(float stateTime) {
         if (isTakingDamage && damageAnimation != null) {
-            return damageAnimation.getKeyFrame(damageAnimationStateTime, false); // Play once
+            return damageAnimation.getKeyFrame(damageAnimationStateTime, false);
         }
         if (idleAnimation != null) {
-            return idleAnimation.getKeyFrame(stateTime, true); // Loop idle
+            return idleAnimation.getKeyFrame(stateTime, true);
         }
         Gdx.app.log("Player", "Returning null frame for player.");
         return null;
@@ -112,7 +112,7 @@ public class Player {
     public int getCurrentHp() { return currentHp; }
 
     public void takeDamage(int amount) {
-        if (!isAlive() || isTakingDamage) return; // Already dead or in damage animation
+        if (!isAlive() || isTakingDamage) return;
 
         this.currentHp -= amount;
         if (this.currentHp < 0) {

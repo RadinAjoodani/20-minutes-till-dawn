@@ -2,11 +2,11 @@
   {
     "class": "model.User",
     "username": "radin",
-    "password": "Radin123!",
+    "password": "Radin1384!",
     "avatarPath": "avatars/avatar_boy.png",
     "securityAnswer": "mamad",
-    "score": 1628,
-    "totalKill": 74,
+    "score": 2310,
+    "totalKill": 105,
     "maximumTimeAlive": 120
   },
   {

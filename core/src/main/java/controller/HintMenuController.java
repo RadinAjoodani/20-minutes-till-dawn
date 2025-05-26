@@ -58,7 +58,7 @@ public class HintMenuController {
             return;
         }
 
-        // 1. Hero Descriptions
+
         Array<Map<String, String>> heroInfos = new Array<>();
         Array<String> heroNames = assetManager.getAllCharacterNames();
         if (heroNames != null) {
@@ -67,16 +67,16 @@ public class HintMenuController {
                 if (data != null) {
                     Map<String, String> heroInfo = new HashMap<>();
                     heroInfo.put("name", data.getName());
-                    // Assuming CharacterData has methods like getHp() and getSpeed()
-                    // If CharacterData has a description field, use that. Otherwise, construct one.
-                    heroInfo.put("description", "HP: " + data.getHp() + ", Speed: " + data.getSpeed() + ". A valiant hero."); // Placeholder description
+
+
+                    heroInfo.put("description", "HP: " + data.getHp() + ", Speed: " + data.getSpeed() + ". A valiant hero.");
                     heroInfos.add(heroInfo);
                 }
             }
         }
         view.setHeroInfo(heroInfos);
 
-        // 2. Game Keys
+
         ObjectMap<String, Integer> keyBindings = gameSettings.getKeyBindings();
         Array<Map<String, String>> keyInfos = new Array<>();
         if (keyBindings != null) {
@@ -89,7 +89,7 @@ public class HintMenuController {
         }
         view.setKeyBindingInfo(keyInfos);
 
-        // 3. Cheat Codes
+
         Array<Map<String, String>> cheatInfos = new Array<>();
         cheatInfos.add(createCheatInfo("Press '1'", "Reduce game time by 1 minute."));
         cheatInfos.add(createCheatInfo("Press '2'", "Advance player to the next level."));
@@ -98,7 +98,7 @@ public class HintMenuController {
         cheatInfos.add(createCheatInfo("Press '5'", "Instantly defeat 10 random non-Boss enemies."));
         view.setCheatCodeInfo(cheatInfos);
 
-        // 4. Abilities
+
         Array<Map<String, String>> abilityInfos = new Array<>();
         for (Ability ability : Ability.values()) {
             Map<String, String> abilityInfo = new HashMap<>();
@@ -108,7 +108,7 @@ public class HintMenuController {
         }
         view.setAbilityInfo(abilityInfos);
 
-        view.populateHints(); // Tell the view to update its tables
+        view.populateHints();
     }
 
     private Map<String, String> createCheatInfo(String key, String description) {

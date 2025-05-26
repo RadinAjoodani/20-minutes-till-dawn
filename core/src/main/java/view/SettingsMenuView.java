@@ -1,4 +1,4 @@
-// view/SettingsMenuView.java
+
 package view;
 
 import com.badlogic.gdx.Gdx;
@@ -25,7 +25,7 @@ public class SettingsMenuView implements Screen {
     private final CheckBox sfxCheckBox;
     private final TextButton backButton;
 
-    // NEW: Auto-reload checkbox
+
     private final CheckBox autoReloadCheckBox;
 
     private Image backgroundImage;
@@ -58,8 +58,8 @@ public class SettingsMenuView implements Screen {
         this.sfxCheckBox = new CheckBox("SFX On/Off", skin);
         this.sfxCheckBox.setChecked(App.getInstance().getGameSettings().isSfxEnabled());
 
-        this.autoReloadCheckBox = new CheckBox("Auto-Reload On/Off", skin); // NEW: Initialize checkbox
-        this.autoReloadCheckBox.setChecked(App.getInstance().getGameSettings().isAutoReloadEnabled()); // NEW: Set initial state
+        this.autoReloadCheckBox = new CheckBox("Auto-Reload On/Off", skin);
+        this.autoReloadCheckBox.setChecked(App.getInstance().getGameSettings().isAutoReloadEnabled());
 
         this.backButton = new TextButton("Back to Main Menu", skin);
         this.keyBindingsTable = new Table(skin);
@@ -85,14 +85,14 @@ public class SettingsMenuView implements Screen {
         rootTable.add(musicTrackSelectBox).width(300).padBottom(15).row();
         rootTable.add(new Label("SFX:", skin)).padRight(10);
         rootTable.add(sfxCheckBox).padBottom(15).row();
-        rootTable.add(new Label("Auto-Reload:", skin)).padRight(10); // NEW: Add label for auto-reload
-        rootTable.add(autoReloadCheckBox).padBottom(15).row();       // NEW: Add auto-reload checkbox
+        rootTable.add(new Label("Auto-Reload:", skin)).padRight(10);
+        rootTable.add(autoReloadCheckBox).padBottom(15).row();
 
         rootTable.add(new Label("Key Bindings:", skin)).colspan(2).padBottom(10).row();
 
         setupKeyBindingsTable();
         rootTable.add(keyBindingsTable).colspan(2).expandX().fillX().padBottom(40).row();
-        rootTable.add(backButton).center().width(380).height(80).padTop(20).row();
+        rootTable.add(backButton).center().width(500).height(80).padTop(20).row();
 
         stage.addActor(rootTable);
         rootTable.pack();
@@ -108,11 +108,11 @@ public class SettingsMenuView implements Screen {
         keyBindingsTable.defaults().pad(5).left();
 
         GameSettings settings = App.getInstance().getGameSettings();
-        // This loop will now include "Reload" since it's in GameSettings
+
         for (String action : settings.getKeyBindings().keys()) {
             keyBindingsTable.add(new Label(action + ":", skin)).width(150);
             TextButton keyButton = new TextButton(GameSettings.getKeyName(settings.getKeyBindings().get(action)), skin);
-            keyButton.setUserObject(action); // Store the action string in the button for identification
+            keyButton.setUserObject(action);
             keyBindingsTable.add(keyButton).width(120).pad(15,5,5,5);
             keyBindingButtons.add(keyButton);
         }
@@ -121,7 +121,7 @@ public class SettingsMenuView implements Screen {
 
     public void updateKeyBindingButton(String action, String newKeyName) {
         for (TextButton button : keyBindingButtons) {
-            // Compare by user object (the action string)
+
             if (button.getUserObject() != null && button.getUserObject().equals(action)) {
                 button.setText(newKeyName);
                 break;
@@ -182,5 +182,5 @@ public class SettingsMenuView implements Screen {
     public TextButton getBackButton() { return backButton; }
     public Array<TextButton> getKeyBindingButtons() { return keyBindingButtons; }
     public Stage getStage() { return stage; }
-    public CheckBox getAutoReloadCheckBox() { return autoReloadCheckBox; } // NEW: Getter for auto-reload checkbox
+    public CheckBox getAutoReloadCheckBox() { return autoReloadCheckBox; }
 }

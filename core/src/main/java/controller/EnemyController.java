@@ -166,42 +166,35 @@ public class EnemyController {
             float playerTargetX = playerWorldX;
             float playerTargetY = playerWorldY;
 
-            // Player target calculation (already good from previous logic)
-            // Animation<TextureRegion> playerAnim = player.getIdleAnimation();
-            // if (playerAnim != null) {
-            //     TextureRegion playerFrame = playerAnim.getKeyFrame(0);
-            //     if (playerFrame != null) {
-            //         playerTargetX = playerWorldX;
-            //         playerTargetY = playerWorldY;
-            //     }
-            // }
+            enemy.update(delta, playerTargetX, playerTargetY);
 
-            enemy.update(delta, playerTargetX, playerTargetY); // Update first, including dying animation timer
-
-            // Check if enemy is completely dead (animation finished)
             if (enemy.isDying() && enemy.isDeathAnimationFinished()) {
                 Gdx.app.log("EnemyController", enemy.getName() + " death animation finished. Removing.");
                 if (seedTextureRegion != null) {
-                    droppedSeeds.add(new Seed(enemy.getX() + enemy.getBounds().width / 2, // Use current bounds for seed drop
+                    droppedSeeds.add(new Seed(enemy.getX() + enemy.getBounds().width / 2,
                         enemy.getY() + enemy.getBounds().height / 2,
                         seedTextureRegion, enemy.getName().equals(TREE_ENEMY_NAME) || enemy.getName().equals(BOSS_ENEMY_NAME) ? 10 : 3));
                 }
                 activeEnemies.removeIndex(i);
                 enemiesKilled++;
-                continue; // Skip further processing for this removed enemy
+                continue;
             }
 
-            // If not dying or death animation not finished, do other checks
-            if (player.isAlive() && !enemy.isDying() && // Don't attack if enemy is dying
+            if (player.isAlive() && !enemy.isDying() &&
                 enemy.getEnemyData() != null && enemy.getEnemyData().getDamage() > 0 &&
                 enemy.getBounds().overlaps(player.getBounds(stateTimeForPlayerBounds))) {
                 if (enemy.canAttack(delta)) {
-                    player.takeDamage(enemy.getEnemyData().getDamage()); // Player takeDamage triggers its own animation
+                    player.takeDamage(enemy.getEnemyData().getDamage());
                 }
             }
 
-            if (enemy.getName().equals(EYE_BAT_NAME) && enemy.isAlive() && !enemy.isDying()) { // Check not dying
-                if (enemy.canShoot(delta)) shootEnemyBullet(enemy, playerTargetX, playerTargetY);
+            // EyeBat shooting logic with added logging
+            if (enemy.getName().equals(EYE_BAT_NAME) && enemy.isAlive() && !enemy.isDying()) {
+                // Gdx.app.log("EnemyCtrl_EyeBat", "Checking EyeBat. Alive: " + enemy.isAlive() + ", NotDying: " + !enemy.isDying() + ", ShootTimerInEnemy: " + enemy.getShootTimerValueForDebug());
+                if (enemy.canShoot(delta)) {
+                    Gdx.app.log("EnemyCtrl_EyeBat", "EyeBat CAN SHOOT. Calling shootEnemyBullet for " + enemy.getName());
+                    shootEnemyBullet(enemy, playerTargetX, playerTargetY);
+                }
             }
         }
 
@@ -209,7 +202,7 @@ public class EnemyController {
         for (int i = enemyBullets.size - 1; i >= 0; i--) {
             Bullet bullet = enemyBullets.get(i);
             bullet.update(delta);
-            if (player.isAlive() && !player.isTakingDamage() && // Player shouldn't take damage if already in hit animation (optional invincibility frames)
+            if (player.isAlive() && !player.isTakingDamage() &&
                 bullet.getBounds().overlaps(player.getBounds(stateTimeForPlayerBounds))) {
                 player.takeDamage(bullet.getDamage());
                 enemyBullets.removeIndex(i);
@@ -244,10 +237,9 @@ public class EnemyController {
             Gdx.app.error("EnemyController", "EdgeSpawn: Enemy data not found for: " + enemyName + ". Cannot spawn.");
             return;
         }
-        // For Boss, spawnSpecificEnemyAtRandomPosition is now called directly by cheat/timer
         if (enemyName.equals(BOSS_ENEMY_NAME)) {
             Gdx.app.debug("EnemyController", "spawnSpecificEnemy called for Boss, using near player logic via spawnEnemy(data, false).");
-            spawnEnemy(enemyData, false); // Spawn Boss near player
+            spawnEnemy(enemyData, false);
         } else {
             spawnEnemy(enemyData, true);
         }
@@ -313,9 +305,8 @@ public class EnemyController {
 
             float cameraX = player.getX();
             float cameraY = player.getY();
-            // Clamp to be somewhat within the current camera's wider view to prevent extreme off-screen spawns for "near player"
-            float maxSpawnRangeX = screenWidth; // Can spawn up to one screen width away
-            float maxSpawnRangeY = screenHeight; // Can spawn up to one screen height away
+            float maxSpawnRangeX = screenWidth * 0.7f;
+            float maxSpawnRangeY = screenHeight * 0.7f;
 
             spawnX = MathUtils.clamp(spawnX, cameraX - maxSpawnRangeX, cameraX + maxSpawnRangeX);
             spawnY = MathUtils.clamp(spawnY, cameraY - maxSpawnRangeY, cameraY + maxSpawnRangeY);
@@ -343,21 +334,28 @@ public class EnemyController {
             String animationName = entry.key;
             Array<String> paths = entry.value;
             if (paths != null && paths.size > 0) {
-                Array<TextureRegion> frames = new Array<>();
+                Array<TextureRegion> framesGdxArray = new Array<>(TextureRegion.class);
                 for (String path : paths) {
                     Texture texture = assetManager.getTexture(path);
-                    if (texture != null) frames.add(new TextureRegion(texture));
-                    else Gdx.app.error("EnemyController", "TEXTURE NOT FOUND for enemy ("+enemyData.getName()+") anim '"+animationName+"' frame: [" + path + "]");
+                    if (texture != null) {
+                        framesGdxArray.add(new TextureRegion(texture));
+                    } else {
+                        Gdx.app.error("EnemyController", "TEXTURE NOT FOUND for enemy ("+enemyData.getName()+") anim '"+animationName+"' frame: [" + path + "]");
+                    }
                 }
-                if (frames.size > 0) {
+
+                if (framesGdxArray.size > 0) {
                     Animation.PlayMode playMode = Animation.PlayMode.LOOP;
                     float frameDuration = 0.1f;
                     if (animationName.equalsIgnoreCase("spawn") || animationName.equalsIgnoreCase("damaged") || animationName.equalsIgnoreCase("death") || animationName.equalsIgnoreCase("dash")) {
                         playMode = Animation.PlayMode.NORMAL;
                         frameDuration = animationName.equalsIgnoreCase("spawn") ? 0.15f : (animationName.equalsIgnoreCase("dash") ? 0.05f : 0.1f) ;
                     }
-                    loadedAnimations.put(animationName, new Animation<>(frameDuration, frames, playMode));
-                } else Gdx.app.error("EnemyController", "No frames loaded for anim '"+animationName+"' for enemy: " + enemyData.getName());
+                    Animation<TextureRegion> animation = new Animation<>(frameDuration, framesGdxArray, playMode);
+                    loadedAnimations.put(animationName, animation);
+                } else {
+                    Gdx.app.error("EnemyController", "No frames loaded for anim '"+animationName+"' for enemy: " + enemyData.getName());
+                }
             }
         }
         if (loadedAnimations.isEmpty() && !animationPaths.isEmpty()) Gdx.app.error("EnemyController", "CRITICAL: No animations loaded for " + enemyData.getName() + " despite paths in JSON.");
@@ -365,6 +363,7 @@ public class EnemyController {
     }
 
     private void shootEnemyBullet(Enemy shooter, float targetX, float targetY) {
+        Gdx.app.log("EnemyCtrl_EyeBat", "shootEnemyBullet called for " + shooter.getName()); // Added log
         Vector2 enemyCenter = new Vector2(shooter.getX() + shooter.getBounds().width / 2, shooter.getY() + shooter.getBounds().height / 2);
         Vector2 directionToPlayer = new Vector2(targetX - enemyCenter.x, targetY - enemyCenter.y).nor();
         float offsetDistance = shooter.getBounds().width / 2 + 10;
@@ -374,6 +373,7 @@ public class EnemyController {
         int bulletDamage = shooter.getEnemyData().getDamage();
         if (enemyBulletTextureRegion == null) {Gdx.app.error("EnemyController", "Cannot shoot, enemyBulletTextureRegion is null"); return;}
         enemyBullets.add(new Bullet(bulletStartX, bulletStartY, bulletSpeed, directionToPlayer.x, directionToPlayer.y, enemyBulletTextureRegion, ENEMY_BULLET_DRAW_WIDTH, ENEMY_BULLET_DRAW_HEIGHT, bulletDamage));
+        Gdx.app.log("EnemyCtrl_EyeBat", shooter.getName() + " ADDED A BULLET to enemyBullets array. Size: " + enemyBullets.size); // Added log
     }
 
     public void checkBulletCollisions(Array<Bullet> bullets) {
